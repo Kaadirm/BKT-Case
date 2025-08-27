@@ -1,0 +1,9 @@
+[
+  {"id":"ecf2023","name":"ECF 2023","subtitle":"Example Custom Framework","status":"Ready to Map","statusClass":"status-ready","icon":"bi-app-indicator"},
+  {"id":"cshrtn","name":"CSHRTN","subtitle":"Custom Framework","status":"Mapping in Progress","statusClass":"status-progress","icon":"bi-record-circle"},
+  {"id":"dcf2023","name":"DCF 2023","subtitle":"Demo Custom Framework","status":"Ready to Publish","statusClass":"status-ready","icon":"bi-bezier"},
+  {"id":"cf","name":"CF","subtitle":"Cybersecurity Framework","status":"Mapping Failed","statusClass":"status-failed","icon":"bi-shield-lock"},
+  {"id":"iscf","name":"ISCF","subtitle":"Internet Security Custom Framework","status":"Published","statusClass":"status-published","icon":"bi-diagram-3"},
+  {"id":"cshrtn2","name":"CSHRTN 2","subtitle":"Custom Framework","status":"Deactivated","statusClass":"status-deactivated","icon":"bi-pie-chart"},
+  {"id":"gdpr","name":"GDPR","subtitle":"General Data Protection Regulation","status":"System","statusClass":"text-bg-light","icon":"bi-patch-check"}
+]

@@ -1,0 +1,7 @@
+{
+  "rows": [
+    {"controlId":"CF-1","controlCategory":"Cybersecurity","controlDescription":"Protect systems and networks."},
+    {"controlId":"CF-2","controlCategory":"Cybersecurity","controlDescription":"Detect cybersecurity events promptly."},
+    {"controlId":"CF-3","controlCategory":"Cybersecurity","controlDescription":"Respond to identified cybersecurity incidents."}
+  ]
+}

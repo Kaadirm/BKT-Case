@@ -1,0 +1,25 @@
+{
+  "name": "bktcase-ui",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BKT Frameworks case - SASS, Vanilla JS, Fetch",
+  "scripts": {
+  "sass:watch": "sass --quiet-deps --load-path=node_modules src/scss:dist/css --watch --style=expanded",
+  "sass:build": "sass --quiet-deps --load-path=node_modules src/scss:dist/css --no-source-map --style=compressed",
+  "serve": "http-server -c-1 -p 5173 .",
+  "proxy": "node dev-proxy.js",
+  "dev": "concurrently -k \"npm:proxy\" \"npm:serve\" \"npm:sass:watch\"",
+  "build": "npm run sass:build",
+  "start": "npm run serve"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3"
+  },
+  "devDependencies": {
+  "concurrently": "^8.2.2",
+  "http-server": "^14.1.1",
+  "node-fetch": "^3.3.2",
+  "sass": "^1.77.0",
+  "express": "^4.19.2"
+  }
+}

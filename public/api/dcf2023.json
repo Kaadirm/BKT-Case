@@ -1,0 +1,9 @@
+{
+  "rows": [
+    {"controlId":"DCF-1","controlCategory":"Category A","controlDescription":"Demo control one."},
+    {"controlId":"DCF-2","controlCategory":"Category A","controlDescription":"Demo control two."},
+    {"controlId":"DCF-3","controlCategory":"Category B","controlDescription":"Demo control three."},
+    {"controlId":"DCF-4","controlCategory":"Category B","controlDescription":"Demo control four."},
+    {"controlId":"DCF-5","controlCategory":"Category C","controlDescription":"Demo control five."}
+  ]
+}

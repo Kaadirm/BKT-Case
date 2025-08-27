@@ -1,0 +1,75 @@
+// Import Bootstrap from node_modules
+@use "bootstrap/scss/bootstrap" as *;
+
+// App variables / tokens
+$brand-gray-50: #f5f7fa;
+$brand-gray-100: #eef2f6;
+$brand-gray-600: #6b7280;
+
+:root {
+  --app-bg: #f6f8fb;
+}
+
+html, body {
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  background: var(--app-bg);
+}
+
+.app-header, .app-footer { position: sticky; z-index: 1020; }
+.app-header { top: 0; }
+.app-footer { bottom: 0; }
+
+.min-vh-40 { min-height: 40vh; }
+
+// Left list styles
+#frameworkList li { list-style: none; }
+.framework-item {
+  @extend .card;
+  @extend .shadow-sm;
+  border: 0;
+  background: #fff;
+  cursor: pointer;
+  transition: transform .08s ease-in-out, box-shadow .2s ease-in-out;
+
+  .avatar {
+    width: 44px; height: 44px;
+    @extend .rounded-3; @extend .d-inline-flex; @extend .align-items-center; @extend .justify-content-center;
+    font-size: 1.25rem;
+  }
+
+  &:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+  &.active { outline: 2px solid rgba(var(--bs-success-rgb), .25); }
+}
+
+.status-chip { @extend .badge; font-weight: 500; }
+.status-ready { @extend .text-bg-primary; }
+.status-progress { @extend .text-bg-warning; color: #000 !important; }
+.status-failed { @extend .text-bg-danger; }
+.status-published { @extend .text-bg-success; }
+.status-deactivated { @extend .text-bg-secondary; }
+
+// Stepper
+.stepper-head .step-badge {
+  width: 28px; height: 28px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center;
+  background: $brand-gray-100; color: $brand-gray-600; font-weight: 600; font-size: .8rem;
+}
+
+.stepper {
+  // Only JS toggles the data-step attribute; CSS decides which step is visible.
+  .step { display: none; }
+  &[data-step="1"] .step[data-index="1"],
+  &[data-step="2"] .step[data-index="2"],
+  &[data-step="3"] .step[data-index="3"] { display: block; }
+}
+
+// Simple table tweaks
+.simple-table {
+  table { @extend .table; @extend .table-hover; }
+  .table thead th { white-space: nowrap; }
+  .sort-indicator { opacity: .45; }
+  .sorted-asc .sort-indicator::after { content: "\2191"; margin-left: .25rem; }
+  .sorted-desc .sort-indicator::after { content: "\2193"; margin-left: .25rem; }
+}
+
+// Form validation helper
+.needs-validation.was-validated .form-control:invalid { border-color: var(--bs-danger); }

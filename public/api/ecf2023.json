@@ -1,0 +1,14 @@
+{
+  "rows": [
+    {"controlId":"ECF-1","controlCategory":"Governance","controlDescription":"Define roles and responsibilities for data protection."},
+    {"controlId":"ECF-2","controlCategory":"Risk Management","controlDescription":"Perform regular risk assessments for new systems."},
+    {"controlId":"ECF-3","controlCategory":"Awareness","controlDescription":"Conduct annual security awareness training."},
+    {"controlId":"ECF-4","controlCategory":"Access Control","controlDescription":"Implement least privilege and periodic access reviews."},
+    {"controlId":"ECF-5","controlCategory":"Incident Response","controlDescription":"Maintain an incident response plan with contact list."},
+    {"controlId":"ECF-6","controlCategory":"Business Continuity","controlDescription":"Back up critical data daily and test restores quarterly."},
+    {"controlId":"ECF-7","controlCategory":"Monitoring","controlDescription":"Log critical events centrally and review weekly."},
+    {"controlId":"ECF-8","controlCategory":"Change Management","controlDescription":"All production changes require approval and roll-back plan."},
+    {"controlId":"ECF-9","controlCategory":"Vendor Management","controlDescription":"Review vendors for security posture annually."},
+    {"controlId":"ECF-10","controlCategory":"Secure Development","controlDescription":"Adopt secure coding standards and code reviews."}
+  ]
+}
