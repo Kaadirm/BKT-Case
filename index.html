@@ -1,170 +1,228 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Compliance Frameworks</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Compiled SASS output -->
-    <link href="dist/css/styles.css" rel="stylesheet" />
-    <!-- Bootstrap Icons for a few UI glyphs -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  </head>
-  <body>
-    <header class="app-header border-bottom bg-white">
-      <div class="container-fluid py-3 d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-2">
-          <span class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width:40px;height:40px">
-            <i class="bi bi-cube"></i>
-          </span>
-          <div>
-            <h1 class="h5 mb-0 fw-semibold">Compliance Frameworks</h1>
-            <small class="text-secondary">Admin · Compliance Frameworks</small>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Compliance Frameworks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <!-- Compiled SASS output -->
+  <link href="dist/css/styles.css" rel="stylesheet" />
+  <!-- Bootstrap Icons for a few UI glyphs -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+  <!-- Header Section -->
+  <header class="app-header">
+    <div>
+      <!-- Header content can be added here if needed -->
+    </div>
+  </header>
+
+  <main class="table-main">
+    <!-- Table Toolbar Section -->
+    <section class="table-toolbar">
+      <div class="toolbar-frame">
+        <!-- Left: Icon + Title + Breadcrumb -->
+        <div class="toolbar-info">
+          <div class="icon">
+            <span class=" text-success d-inline-flex align-items-center justify-content-center">
+              <svg width="44" height="48" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true" focusable="false">
+                <path
+                  d="M43.2 34.8C43.2 35.712 42.696 36.504 41.928 36.912L22.968 47.568C22.584 47.856 22.104 48 21.6 48C21.096 48 20.616 47.856 20.232 47.568L1.272 36.912C0.504 36.504 0 35.712 0 34.8V13.2C0 12.288 0.504 11.496 1.272 11.088L20.232 0.432C20.616 0.144 21.096 0 21.6 0C22.104 0 22.584 0.144 22.968 0.432L41.928 11.088C42.696 11.496 43.2 12.288 43.2 13.2V34.8ZM21.6 5.16L17.064 7.728L31.2 15.864L35.904 13.2L21.6 5.16ZM7.296 13.2L21.6 21.24L26.304 18.6L12.192 10.44L7.296 13.2ZM4.8 33.384L19.2 41.496V25.392L4.8 17.304V33.384ZM38.4 33.384V17.304L24 25.392V41.496L38.4 33.384Z"
+                  fill="#3DCC77" />
+              </svg>
+            </span>
+          </div>
+          <div class="info-header">
+            <h2 class="info-title">Compliance Frameworks: GDPR</h2>
+            <nav class="breadcrumb" aria-label="breadcrumb">
+              <ol class="breadcrumb small mb-0 text-secondary" style="--bs-breadcrumb-divider: '›';">
+                <li class="breadcrumb-item"><a href="#" class="text-secondary text-decoration-none">Admin</a></li>
+                <li class="breadcrumb-item"><a href="#" class="text-secondary text-decoration-none">Compliance
+                    Frameworks</a></li>
+                <li class="breadcrumb-item" aria-current="page">GDPR</li>
+              </ol>
+            </nav>
           </div>
         </div>
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-outline-secondary btn-sm"><i class="bi bi-question-circle me-1"></i>Help</button>
-          <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#newFrameworkModal">
-            <i class="bi bi-plus-lg me-1"></i> New Custom Framework <span class="badge text-bg-light ms-1">1/3</span>
+
+        <!-- Right: Actions -->
+        <div class="toolbar-actions">
+          <button type="button" class="help-button">
+            <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_201_10557)">
+                <path
+                  d="M4.4 10.7H6.2V12.5H4.4V10.7ZM5.6 0.5C8.81 0.632 10.208 3.872 8.3 6.302C7.802 6.902 6.998 7.298 6.602 7.802C6.2 8.3 6.2 8.9 6.2 9.5H4.4C4.4 8.498 4.4 7.652 4.802 7.052C5.198 6.452 6.002 6.098 6.5 5.702C7.952 4.358 7.592 2.456 5.6 2.3C5.12261 2.3 4.66477 2.48964 4.32721 2.82721C3.98964 3.16477 3.8 3.62261 3.8 4.1H2C2 3.14522 2.37928 2.22955 3.05442 1.55442C3.72955 0.879285 4.64522 0.5 5.6 0.5Z"
+                  fill="white" />
+              </g>
+              <defs>
+                <clipPath id="clip0_201_10557">
+                  <rect width="12" height="12" fill="white" transform="translate(0 0.5)" />
+                </clipPath>
+              </defs>
+            </svg>
+            <span>Help</span></button>
+          <button type="button" class="new-framework-button">
+            <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 7.21417H6.71417V11.5H5.28583V7.21417H1V5.78583H5.28583V1.5H6.71417V5.78583H11V7.21417Z"
+                fill="white" />
+            </svg>
+            <span>New Custom Framework</span> <span class="count-badge">1/3</span>
           </button>
         </div>
       </div>
-    </header>
+    </section>
 
-    <main class="container-fluid py-3">
-      <div class="row g-3">
-        <aside class="col-12 col-lg-3">
-          <nav aria-label="Frameworks">
-            <ul id="frameworkList" class="list-unstyled vstack gap-2"></ul>
-          </nav>
-        </aside>
-        <section class="col-12 col-lg-9">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <div id="tableToolbar" class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3 d-none">
-                <div class="input-group input-group-sm" style="max-width: 320px;">
-                  <span class="input-group-text bg-body-tertiary border-0"><i class="bi bi-search"></i></span>
-                  <input id="tableSearch" type="search" class="form-control border-0" placeholder="Search" aria-label="Search" />
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <label class="text-secondary small mb-0" for="pageSize">Show</label>
-                  <select id="pageSize" class="form-select form-select-sm" style="width:86px">
-                    <option>10</option>
-                    <option>25</option>
-                    <option>50</option>
-                  </select>
-                </div>
+    <div class="table-layout">
+      <aside class="table-sidebar">
+        <nav aria-label="Frameworks">
+          <ul id="frameworkList" class="framework-list"></ul>
+        </nav>
+      </aside>
+
+      <section class="table-content">
+        <div class="table-card">
+          <div class="table-card-body">
+            <div id="tableToolbar" class="table-toolbar-controls hidden">
+              <div class="search-group">
+                <span class="search-icon"><i class="bi bi-search"></i></span>
+                <input id="tableSearch" type="search" class="search-input" placeholder="Search" aria-label="Search" />
               </div>
-              <div id="tableHost" class="min-vh-40 d-flex align-items-center justify-content-center text-secondary py-5">
-                <div class="text-center">
-                  <div class="display-6 mb-2"><i class="bi bi-ui-checks-grid"></i></div>
-                  <p class="mb-0">Please select framework from list on the left side<br/> or <a href="#" data-bs-toggle="modal" data-bs-target="#newFrameworkModal">click here</a> to add new framework</p>
-                </div>
+              <div class="pagination-controls">
+                <label class="pagination-label" for="pageSize">Show</label>
+                <select id="pageSize" class="pagination-select">
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                </select>
+              </div>
+            </div>
+            <div id="tableHost" class="table-empty-state">
+              <div class="empty-state-content">
+                <div class="empty-state-icon"><i class="bi bi-ui-checks-grid"></i></div>
+                <p class="empty-state-text">Please select framework from list on the left side<br /> or <a href="#"
+                    data-bs-toggle="modal" data-bs-target="#newFrameworkModal">click here</a> to add new framework</p>
               </div>
             </div>
           </div>
-        </section>
-      </div>
-    </main>
+        </div>
+      </section>
+    </div>
+  </main>
 
-    <footer class="app-footer border-top bg-white">
-      <div class="container-fluid small py-3 text-secondary">Demo footer · Visual only</div>
-    </footer>
+  <!-- Footer Section -->
+  <footer class="app-footer bg-white border-top">
+    <div>
+      <!-- Footer content can be added here if needed -->
+    </div>
+  </footer>
 
-    <!-- New Custom Framework Modal -->
-    <div class="modal fade" id="newFrameworkModal" tabindex="-1" aria-labelledby="newFrameworkModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2 class="modal-title fs-5" id="newFrameworkModalLabel">Add New Framework <span class="text-secondary small ms-1">1/3</span></h2>
-            <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div id="frameworkStepper" class="stepper" data-step="1">
-              <!-- Stepper header -->
-              <div class="stepper-head d-flex align-items-center justify-content-between mb-3">
-                <div class="d-flex align-items-center gap-2">
-                  <div class="step-badge" aria-hidden="true">01</div>
-                  <div class="fw-medium">Framework Details</div>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <div class="fw-medium">Control Items</div>
-                  <div class="step-badge" aria-hidden="true">02</div>
-                </div>
+  <!-- New Custom Framework Modal -->
+  <div class="modal fade" id="newFrameworkModal" tabindex="-1" aria-labelledby="newFrameworkModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="newFrameworkModalLabel">Add New Framework <span
+              class="text-secondary small ms-1">1/3</span></h2>
+          <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="frameworkStepper" class="stepper" data-step="1">
+            <!-- Stepper header -->
+            <div class="stepper-head d-flex align-items-center justify-content-between mb-3">
+              <div class="d-flex align-items-center gap-2">
+                <div class="step-badge" aria-hidden="true">01</div>
+                <div class="fw-medium">Framework Details</div>
               </div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="fw-medium">Control Items</div>
+                <div class="step-badge" aria-hidden="true">02</div>
+              </div>
+            </div>
 
-              <!-- Steps -->
-              <div class="step" data-index="1" data-validate="#frameworkForm">
-                <form id="frameworkForm" class="needs-validation" novalidate>
-                  <div class="alert alert-info py-2 small">You can 1 Enterprise Framework license available.</div>
-                  <div class="row g-3">
-                    <div class="col-md-6">
-                      <label class="form-label">Name</label>
-                      <input class="form-control" name="name" required placeholder="Enter name" />
-                      <div class="invalid-feedback">Name is required.</div>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Short Name</label>
-                      <input class="form-control" name="shortName" required placeholder="Enter short name" />
-                      <div class="invalid-feedback">Short name is required.</div>
-                    </div>
-                    <div class="col-md-12">
-                      <label class="form-label">Upload Framework Logo</label>
-                      <input type="file" class="form-control" />
-                    </div>
-                    <div class="col-md-12">
-                      <label class="form-label">Description</label>
-                      <textarea class="form-control" rows="3" placeholder="Please add description"></textarea>
-                    </div>
-                    <div class="col-md-12">
-                      <label class="form-label">Upload Template</label>
-                      <input type="file" class="form-control" />
-                    </div>
+            <!-- Steps -->
+            <div class="step" data-index="1" data-validate="#frameworkForm">
+              <form id="frameworkForm" class="needs-validation" novalidate>
+                <div class="alert alert-info py-2 small">You can 1 Enterprise Framework license available.</div>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Name</label>
+                    <input class="form-control" name="name" required placeholder="Enter name" />
+                    <div class="invalid-feedback">Name is required.</div>
                   </div>
-                </form>
-              </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Short Name</label>
+                    <input class="form-control" name="shortName" required placeholder="Enter short name" />
+                    <div class="invalid-feedback">Short name is required.</div>
+                  </div>
+                  <div class="col-md-12">
+                    <label class="form-label">Upload Framework Logo</label>
+                    <input type="file" class="form-control" />
+                  </div>
+                  <div class="col-md-12">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" rows="3" placeholder="Please add description"></textarea>
+                  </div>
+                  <div class="col-md-12">
+                    <label class="form-label">Upload Template</label>
+                    <input type="file" class="form-control" />
+                  </div>
+                </div>
+              </form>
+            </div>
 
-              <div class="step" data-index="2">
-                <div class="d-flex justify-content-end mb-2">
-                  <button class="btn btn-sm btn-outline-secondary me-2" data-action="addMockItems"><i class="bi bi-plus-lg me-1"></i>Add Control Items</button>
-                </div>
-                <div class="table-responsive border rounded">
-                  <table class="table table-sm align-middle mb-0" id="newFwItemsTable">
-                    <thead class="table-light">
-                      <tr>
-                        <th style="width: 160px;">Control ID</th>
-                        <th style="width: 240px;">Control Category</th>
-                        <th>Control Description</th>
-                        <th class="text-end" style="width: 100px;">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
+            <div class="step" data-index="2">
+              <div class="d-flex justify-content-end mb-2">
+                <button class="btn btn-sm btn-outline-secondary me-2" data-action="addMockItems"><i
+                    class="bi bi-plus-lg me-1"></i>Add Control Items</button>
+              </div>
+              <div class="table-responsive border rounded">
+                <table class="table table-sm align-middle mb-0" id="newFwItemsTable">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 160px;">Control ID</th>
+                      <th style="width: 240px;">Control Category</th>
+                      <th>Control Description</th>
+                      <th class="text-end" style="width: 100px;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <div class="d-flex w-100 justify-content-between">
-              <div>
-                <button class="btn btn-secondary" data-stepper-control="prev" data-stepper-target="#frameworkStepper">Previous Step</button>
-              </div>
-              <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-success" data-stepper-control="next" data-stepper-target="#frameworkStepper">Next › Control Items</button>
-                <button class="btn btn-primary d-none" id="saveFrameworkBtn">Save</button>
-              </div>
+        </div>
+        <div class="modal-footer">
+          <div class="d-flex w-100 justify-content-between">
+            <div>
+              <button class="btn btn-secondary" data-stepper-control="prev"
+                data-stepper-target="#frameworkStepper">Previous Step</button>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button class="btn btn-success" data-stepper-control="next" data-stepper-target="#frameworkStepper">Next ›
+                Control Items</button>
+              <button class="btn btn-primary d-none" id="saveFrameworkBtn">Save</button>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Bootstrap JS (for modal) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <!-- Our app scripts -->
-    <script type="module" src="src/js/main.js"></script>
-  </body>
+  <!-- Bootstrap JS (for modal) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"></script>
+  <!-- Our app scripts -->
+  <script type="module" src="src/js/main.js"></script>
+</body>
+
 </html>

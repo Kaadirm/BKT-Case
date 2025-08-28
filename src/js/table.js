@@ -46,9 +46,10 @@ export class SimpleTable {
 
     // Footer / pagination
     this.footer = document.createElement('div');
-    this.footer.className = 'd-flex align-items-center justify-content-between small text-secondary';
+    this.footer.className = 'd-flex align-items-center justify-content-between small text-secondary mt-3 px-2';
     this.info = document.createElement('div');
     this.pag = document.createElement('div');
+    this.pag.className = 'd-flex align-items-center gap-1';
     this.footer.append(this.info, this.pag);
 
     const wrapperInner = document.createElement('div');
@@ -114,7 +115,15 @@ export class SimpleTable {
       const tr = document.createElement('tr');
       for (const col of this.columns) {
         const td = document.createElement('td');
-        td.textContent = row[col.key] ?? '';
+        
+        if (col.render && typeof col.render === 'function') {
+          // Use custom render function for this column
+          td.innerHTML = col.render(row[col.key], row);
+        } else {
+          // Default text rendering
+          td.textContent = row[col.key] ?? '';
+        }
+        
         tr.appendChild(td);
       }
       this.tbody.appendChild(tr);
@@ -127,24 +136,60 @@ export class SimpleTable {
     // Pagination controls
     const pages = Math.max(1, Math.ceil(total / this.pageSize));
     this.pag.innerHTML = '';
-    const makeBtn = (label, disabled, page) => {
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-light btn-sm me-1';
-      btn.textContent = label;
-      btn.disabled = disabled;
-      btn.addEventListener('click', () => { this.currentPage = page; this._render(); });
-      return btn;
-    };
-    this.pag.appendChild(makeBtn('Previous', this.currentPage === 1, Math.max(1, this.currentPage - 1)));
-    // Simple pager: show up to 5 pages centered
-    const range = 2;
-    const startPage = Math.max(1, this.currentPage - range);
-    const endPage = Math.min(pages, this.currentPage + range);
-    for (let p = startPage; p <= endPage; p++) {
-      const b = makeBtn(String(p), false, p);
-      if (p === this.currentPage) b.classList.replace('btn-light', 'btn-primary');
-      this.pag.appendChild(b);
+    
+    if (pages > 1) {
+      const makeBtn = (label, disabled, page) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline-secondary btn-sm';
+        btn.style.minWidth = '32px';
+        btn.textContent = label;
+        btn.disabled = disabled;
+        if (disabled) {
+          btn.classList.add('disabled');
+        }
+        btn.addEventListener('click', () => { this.currentPage = page; this._render(); });
+        return btn;
+      };
+      
+      this.pag.appendChild(makeBtn('Previous', this.currentPage === 1, Math.max(1, this.currentPage - 1)));
+      
+      // Simple pager: show up to 5 pages centered
+      const range = 2;
+      const startPage = Math.max(1, this.currentPage - range);
+      const endPage = Math.min(pages, this.currentPage + range);
+      
+      // Show first page if not in range
+      if (startPage > 1) {
+        this.pag.appendChild(makeBtn('1', false, 1));
+        if (startPage > 2) {
+          const ellipsis = document.createElement('span');
+          ellipsis.className = 'px-2 text-muted';
+          ellipsis.textContent = '...';
+          this.pag.appendChild(ellipsis);
+        }
+      }
+      
+      for (let p = startPage; p <= endPage; p++) {
+        const b = makeBtn(String(p), false, p);
+        if (p === this.currentPage) {
+          b.classList.remove('btn-outline-secondary');
+          b.classList.add('btn-primary');
+        }
+        this.pag.appendChild(b);
+      }
+      
+      // Show last page if not in range
+      if (endPage < pages) {
+        if (endPage < pages - 1) {
+          const ellipsis = document.createElement('span');
+          ellipsis.className = 'px-2 text-muted';
+          ellipsis.textContent = '...';
+          this.pag.appendChild(ellipsis);
+        }
+        this.pag.appendChild(makeBtn(String(pages), false, pages));
+      }
+      
+      this.pag.appendChild(makeBtn('Next', this.currentPage === pages, Math.min(pages, this.currentPage + 1)));
     }
-    this.pag.appendChild(makeBtn('Next', this.currentPage === pages, Math.min(pages, this.currentPage + 1)));
   }
 }
