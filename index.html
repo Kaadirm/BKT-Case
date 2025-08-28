@@ -24,12 +24,12 @@
     </div>
   </header>
 
-  <main class="table-main">
-    <!-- Table Toolbar Section -->
-    <section class="table-toolbar">
-      <div class="toolbar-frame">
+  <main class="page-main">
+    <!-- Page Header Section -->
+    <section class="page-header">
+      <div class="header-frame">
         <!-- Left: Icon + Title + Breadcrumb -->
-        <div class="toolbar-info">
+        <div class="header-info">
           <div class="icon">
             <span class=" text-success d-inline-flex align-items-center justify-content-center">
               <svg width="44" height="48" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Right: Actions -->
-        <div class="toolbar-actions">
+        <div class="header-actions">
           <button type="button" class="help-button">
             <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g clip-path="url(#clip0_201_10557)">
@@ -92,24 +92,24 @@
           <div class="table-card-body">
             <div id="tableToolbar" class="table-toolbar-controls hidden">
               <div class="search-group">
-                <span class="search-icon"><i class="bi bi-search"></i></span>
-                <input id="tableSearch" type="search" class="search-input" placeholder="Search" aria-label="Search" />
+                <p>Search</p>
+                <input id="tableSearch" type="search" class="search-input" aria-label="Search" />
               </div>
-              <div class="pagination-controls">
+              <!-- <div class="pagination-controls">
                 <label class="pagination-label" for="pageSize">Show</label>
                 <select id="pageSize" class="pagination-select">
                   <option>10</option>
                   <option>25</option>
                   <option>50</option>
                 </select>
-              </div>
+              </div> -->
             </div>
-            <div id="tableHost" class="table-empty-list">
-              <div class="empty-list-content">
-                <div class="empty-list-icon"></div>
-                <p class="empty-list-text">Please select framework from list on the left side or <a href="#"
-                    data-bs-toggle="modal" data-bs-target="#newFrameworkModal">click here</a> to add new framework</p>
-              </div>
+          </div>
+          <div id="tableHost" class="table-empty-list">
+            <div class="empty-list-content">
+              <div class="empty-list-icon"></div>
+              <p class="empty-list-text">Please select framework from list on the left side or <a href="#"
+                  data-bs-toggle="modal" data-bs-target="#newFrameworkModal">click here</a> to add new framework</p>
             </div>
           </div>
         </div>
