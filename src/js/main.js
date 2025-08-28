@@ -122,19 +122,91 @@ function renderFrameworkItem(item) {
   return li;
 }
 
+function renderSkeletonItem() {
+  const li = document.createElement('li');
+  
+  // Create the anchor element with skeleton class
+  const anchor = document.createElement('a');
+  anchor.className = 'framework-item skeleton';
+  
+  // Create main container
+  const mainDiv = document.createElement('div');
+  mainDiv.className = 'item-container';
+  
+  // Create skeleton avatar
+  const avatarDiv = document.createElement('div');
+  avatarDiv.className = 'avatar';
+  
+  // Create skeleton content container
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'item-content';
+  
+  // Create skeleton category label
+  const categoryDiv = document.createElement('div');
+  categoryDiv.className = 'item-category';
+  categoryDiv.textContent = 'Loading...';
+  contentDiv.appendChild(categoryDiv);
+  
+  // Create skeleton header row
+  const headerDiv = document.createElement('div');
+  headerDiv.className = 'item-header';
+
+  // Create skeleton title
+  const nameDiv = document.createElement('div');
+  nameDiv.className = 'item-title';
+  nameDiv.textContent = 'Loading Framework';
+  headerDiv.appendChild(nameDiv);
+  
+  // Create skeleton subtitle
+  const subtitleDiv = document.createElement('div');
+  subtitleDiv.className = 'item-subtitle';
+  subtitleDiv.textContent = 'Loading description...';
+  headerDiv.appendChild(subtitleDiv);
+  
+  // Create skeleton status chip
+  const statusDiv = document.createElement('div');
+  statusDiv.className = 'item-status';
+  
+  const statusIconDiv = document.createElement('div');
+  statusIconDiv.className = 'status-icon';
+  statusDiv.appendChild(statusIconDiv);
+  
+  const statusTextDiv = document.createElement('div');
+  statusTextDiv.className = 'status-text';
+  statusTextDiv.textContent = 'Loading';
+  statusDiv.appendChild(statusTextDiv);
+  
+  // Assemble the structure
+  contentDiv.appendChild(headerDiv);
+  mainDiv.appendChild(avatarDiv);
+  mainDiv.appendChild(contentDiv);
+  anchor.appendChild(mainDiv);
+  anchor.appendChild(statusDiv);
+  li.appendChild(anchor);
+  
+  return li;
+}
+
+function showSkeletonLoading(count = 5) {
+  listEl.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    listEl.appendChild(renderSkeletonItem());
+  }
+}
+
 async function loadFrameworks(options = {}) {
   try {
-    const loadingNotification = notificationService.loading('Loading frameworks...');
+    // Show skeleton loading state
+    showSkeletonLoading(8);
+    
     const items = await frameworkService.getFrameworks(options);
     
-    // Clear existing items
+    // Clear skeleton items
     listEl.innerHTML = '';
     
     for (const item of items) {
       listEl.appendChild(renderFrameworkItem(item));
     }
-    
-    notificationService.hide(loadingNotification);
     
     if (items.length === 0) {
       listEl.innerHTML = '<li class="text-center text-muted p-3">No frameworks found</li>';

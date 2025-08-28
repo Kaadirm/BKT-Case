@@ -1,0 +1,46 @@
+// Status Icons using SVG files
+// All status icons are stored in the icons/ folder
+
+.icon {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.status-icon {
+    @extend .icon;
+    width: 10px;
+    height: 10px;
+}
+
+// Individual status icon classes
+.status-published .status-icon {
+    background-image: url('/public/icons/published.svg');
+}
+
+.status-ready-to-publish .status-icon {
+    background-image: url('/public/icons/ready-to-publish.svg');
+}
+
+.status-ready-to-map .status-icon {
+    background-image: url('/public/icons/ready-to-map.svg');
+}
+
+.status-mapping-in-progress .status-icon {
+    background-image: url('/public/icons/mapping-in-progress.svg');
+}
+
+.status-mapping-failed .status-icon {
+    background-image: url('/public/icons/mapping-failed.svg');
+}
+
+.status-deactivated .status-icon {
+    background-image: url('/public/icons/deactivated.svg');
+}
+
+.empty-list-icon {
+    @extend .icon;
+    width: 96px;
+    height: 96px;
+    background-image: url('/public/icons/empty-list.svg');
+}
