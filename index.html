@@ -95,13 +95,34 @@
                 <label for="tableSearch">Search</label>
                 <input id="tableSearch" type="search" class="search-input" aria-label="Search control items" />
               </div>
-              <div class="pagination-controls">
-                <label class="pagination-label" for="pageSize">Show</label>
-                <select id="pageSize" class="pagination-select">
-                  <option>10</option>
-                  <option>25</option>
-                  <option>50</option>
-                </select>
+            </div>
+            <div class="custom-table-container" id="tableContainer">
+              <table class="custom-table" aria-label="Control items">
+                <thead>
+                  <tr>
+                    <th>Control ID</th>
+                    <th>Control Category</th>
+                    <th>Control Description</th>
+                  </tr>
+                </thead>
+                <tbody id="customTableBody"><!-- Filled dynamically --></tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <div class="table-footer-content">
+                <div class="pagination-controls">
+                  <label class="pagination-label" for="pageSize">Show</label>
+                  <select id="pageSize" class="pagination-select">
+                    <option>10</option>
+                    <option>25</option>
+                    <option>50</option>
+                  </select>
+                  <span class="pagination-label">entries</span>
+                </div>
+                <div id="pageInfo" class="showing-info" aria-live="polite">&nbsp;</div>
+                <div id="pageNav" class="page-nav">
+                  <!-- Pagination buttons will be inserted here -->
+                </div>
               </div>
             </div>
           </div>

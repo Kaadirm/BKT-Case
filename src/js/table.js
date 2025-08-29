@@ -1,6 +1,6 @@
 // A tiny, dependency-free data table with search, sort, and pagination.
 export class SimpleTable {
-  constructor(host, { columns, pageSize = 10 }) {
+  constructor(host, { columns, pageSize = 10, tableClass = 'custom-table', wrapperClass = 'custom-table-container', theadClass = '', externalInfoEl = null, externalPrevBtn = null, externalNextBtn = null, externalPagEl = null } = {}) {
     this.host = host;
     this.columns = columns; // [{key,label,sortable}]
     this.pageSize = pageSize;
@@ -9,6 +9,14 @@ export class SimpleTable {
     this.filtered = [];
     this.sortKey = null;
     this.sortDir = 'asc';
+    this.tableClass = tableClass;
+    this.wrapperClass = wrapperClass;
+    this.theadClass = theadClass;
+    // External footer controls (optional)
+    this.externalInfoEl = externalInfoEl || null;
+    this.externalPrevBtn = externalPrevBtn || null;
+    this.externalNextBtn = externalNextBtn || null;
+    this.externalPagEl = externalPagEl || null;
 
     this._build();
   }
@@ -16,13 +24,13 @@ export class SimpleTable {
   _build() {
     this.host.innerHTML = '';
     this.wrapper = document.createElement('div');
-    this.wrapper.className = 'simple-table';
+    this.wrapper.className = this.wrapperClass;
     this.table = document.createElement('table');
-    this.table.className = 'table table-sm align-middle mb-2';
+    this.table.className = this.tableClass;
 
     // Build thead
     const thead = document.createElement('thead');
-    thead.className = 'table-light';
+    thead.className = this.theadClass;
     const tr = document.createElement('tr');
     for (const col of this.columns) {
       const th = document.createElement('th');
@@ -45,18 +53,42 @@ export class SimpleTable {
     this.table.appendChild(this.tbody);
 
     // Footer / pagination
-    this.footer = document.createElement('div');
-    this.footer.className = 'd-flex align-items-center justify-content-between small text-secondary mt-3 px-2';
-    this.info = document.createElement('div');
-    this.pag = document.createElement('div');
-    this.pag.className = 'd-flex align-items-center gap-1';
-    this.footer.append(this.info, this.pag);
+    const useExternal = !!(this.externalInfoEl || this.externalPrevBtn || this.externalNextBtn);
+    if (useExternal) {
+      // When using external controls, don't render internal footer UI
+      this.info = this.externalInfoEl || document.createElement('div');
+      this.pag = this.externalPagEl || null; // use external pagination container if provided
+      // Attach button handlers once
+      if (this.externalPrevBtn && !this.externalPrevBtn.__boundToTable) {
+        this.externalPrevBtn.addEventListener('click', () => {
+          this.currentPage = Math.max(1, this.currentPage - 1);
+          this._render();
+        });
+        this.externalPrevBtn.__boundToTable = this;
+      }
+      if (this.externalNextBtn && !this.externalNextBtn.__boundToTable) {
+        this.externalNextBtn.addEventListener('click', () => {
+          const total = this.filtered.length;
+          const pages = Math.max(1, Math.ceil(total / this.pageSize));
+          this.currentPage = Math.min(pages, this.currentPage + 1);
+          this._render();
+        });
+        this.externalNextBtn.__boundToTable = this;
+      }
+    } else {
+      this.footer = document.createElement('div');
+      this.footer.className = 'data-table-footer';
+      this.info = document.createElement('div');
+      this.info.className = 'data-table-info';
+      this.pag = document.createElement('div');
+      this.pag.className = 'data-table-pagination';
+      this.footer.append(this.info, this.pag);
+    }
 
-    const wrapperInner = document.createElement('div');
-    wrapperInner.className = 'table-responsive border rounded';
-    wrapperInner.appendChild(this.table);
-
-    this.host.append(wrapperInner, this.footer);
+    // Append to wrapper and host
+    this.wrapper.appendChild(this.table);
+    if (this.footer) this.host.append(this.wrapper, this.footer);
+    else this.host.append(this.wrapper);
   }
 
   setPageSize(n) {
@@ -131,22 +163,28 @@ export class SimpleTable {
 
     // Info text
     const end = Math.min(start + this.pageSize, total);
-    this.info.textContent = total ? `Showing ${start + 1} to ${end} of ${total} entries` : 'No data';
+    const infoText = total ? `Showing ${start + 1} to ${end} of ${total} entries` : 'No data';
+    if (this.info) this.info.textContent = infoText;
+    if (this.externalInfoEl && this.externalInfoEl !== this.info) {
+      this.externalInfoEl.textContent = infoText;
+    }
+
+    // Update external Prev/Next button states if present
+    const pages = Math.max(1, Math.ceil(total / this.pageSize));
+    if (this.externalPrevBtn) this.externalPrevBtn.disabled = this.currentPage === 1 || total === 0;
+    if (this.externalNextBtn) this.externalNextBtn.disabled = this.currentPage === pages || total === 0;
 
     // Pagination controls
-    const pages = Math.max(1, Math.ceil(total / this.pageSize));
-    this.pag.innerHTML = '';
+    if (this.pag) this.pag.innerHTML = '';
 
-    if (pages > 1) {
+    if (this.pag && total > 0) {
       const makeBtn = (label, disabled, page) => {
         const btn = document.createElement('button');
-        btn.className = 'btn btn-outline-secondary btn-sm';
+        btn.className = 'data-table-page-btn';
         btn.style.minWidth = '32px';
         btn.textContent = label;
         btn.disabled = disabled;
-        if (disabled) {
-          btn.classList.add('disabled');
-        }
+        if (disabled) btn.classList.add('is-disabled');
         btn.addEventListener('click', () => { this.currentPage = page; this._render(); });
         return btn;
       };
@@ -163,7 +201,7 @@ export class SimpleTable {
         this.pag.appendChild(makeBtn('1', false, 1));
         if (startPage > 2) {
           const ellipsis = document.createElement('span');
-          ellipsis.className = 'px-2 text-muted';
+          ellipsis.className = 'data-table-ellipsis';
           ellipsis.textContent = '...';
           this.pag.appendChild(ellipsis);
         }
@@ -171,10 +209,7 @@ export class SimpleTable {
 
       for (let p = startPage; p <= endPage; p++) {
         const b = makeBtn(String(p), false, p);
-        if (p === this.currentPage) {
-          b.classList.remove('btn-outline-secondary');
-          b.classList.add('btn-primary');
-        }
+        if (p === this.currentPage) b.classList.add('is-active');
         this.pag.appendChild(b);
       }
 
@@ -182,7 +217,7 @@ export class SimpleTable {
       if (endPage < pages) {
         if (endPage < pages - 1) {
           const ellipsis = document.createElement('span');
-          ellipsis.className = 'px-2 text-muted';
+          ellipsis.className = 'data-table-ellipsis';
           ellipsis.textContent = '...';
           this.pag.appendChild(ellipsis);
         }

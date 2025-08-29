@@ -17,10 +17,14 @@ const notificationService = new NotificationService();
 // Framework list + table init
 const listEl = document.getElementById('frameworkList');
 const tableHost = document.getElementById('tableHost');
+const tableContainer = document.getElementById('tableContainer');
 const tableToolbar = document.getElementById('tableToolbar');
 const tableCardBody = document.querySelector('.table-card-body');
 const searchInput = document.getElementById('tableSearch');
 const pageSizeSelect = document.getElementById('pageSize');
+const pageInfo = document.getElementById('pageInfo');
+const prevPageBtn = document.getElementById('prevPage');
+const nextPageBtn = document.getElementById('nextPage');
 
 let table;
 let currentFrameworkId = null;
@@ -217,12 +221,12 @@ async function loadFrameworks(options = {}) {
     }
 
     if (items.length === 0) {
-      listEl.innerHTML = '<li class="text-center text-muted p-3">No frameworks found</li>';
+      listEl.innerHTML = '<li class="list-empty">No frameworks found</li>';
     }
   } catch (err) {
     if (err && err.name === 'AbortError') return;
     notificationService.error(`Failed to load frameworks: ${err.message}`);
-    listEl.innerHTML = `<li class="text-danger p-3">Failed to load frameworks: ${err.message}</li>`;
+    listEl.innerHTML = `<li class="list-error">Failed to load frameworks: ${err.message}</li>`;
   }
 }
 
@@ -243,16 +247,20 @@ async function openFramework(id) {
     tableToolbar.classList.remove('hidden');
     // Also unhide the container that wraps the toolbar
     if (tableCardBody) tableCardBody.classList.remove('hidden');
-    // Ensure table container is not using empty-state centering styles
-    tableHost.classList.remove('table-empty-list');
+    // Hide empty state by default when loading
+    const emptyEl = tableHost.querySelector('.table-empty-list');
+    if (emptyEl) emptyEl.classList.add('hidden');
     // Update page title + breadcrumb using visible item title (short name)
     const itemEl = listEl.querySelector(`.framework-item[data-id="${id}"]`);
     const displayName = itemEl?.querySelector('.item-title')?.textContent?.trim() || id;
     updatePageHeader(displayName);
 
     // Show loading state only if table is not already present
-    if (!table || !tableHost.contains(table.wrapper)) {
-      tableHost.innerHTML = '<div class="py-5 text-center text-secondary"><div class="spinner-border" role="status" aria-label="Loading"></div><div class="mt-2">Loading data...</div></div>';
+    if (!table || !tableContainer.contains(table.wrapper)) {
+      const empty = tableHost.querySelector('.table-empty-list');
+      if (empty) empty.style.display = 'none';
+      tableContainer.style.display = '';
+      tableContainer.innerHTML = '<div class="loading"><div class="spinner" aria-label="Loading"></div><div class="loading-text">Loading data...</div></div>';
     }
 
     // Create abort controller for this request
@@ -268,16 +276,22 @@ async function openFramework(id) {
     }
 
     // Build table if needed or if previous DOM was replaced
-    if (!table || !tableHost.contains(table.wrapper)) {
-      table = new SimpleTable(tableHost, {
+    if (!table || !tableContainer.contains(table.wrapper)) {
+      // Get the pagination container
+      const pageNavContainer = document.getElementById('pageNav');
+      
+      table = new SimpleTable(tableContainer, {
         columns: [
           { key: 'controlId', label: 'Control ID', sortable: true, width: '18%' },
           { key: 'controlCategory', label: 'Control Category', sortable: true, width: '26%' },
           { key: 'controlDescription', label: 'Control Description', sortable: false, width: 'auto' }
         ],
         pageSize: parseInt(pageSizeSelect.value, 10),
-        caption: 'Control items table',
-        ariaLabel: 'Control items'
+        tableClass: 'custom-table',
+        wrapperClass: 'custom-table-container',
+        theadClass: '',
+        externalInfoEl: pageInfo,
+        externalPagEl: pageNavContainer,
       });
 
       // Setup table event handlers
@@ -287,6 +301,24 @@ async function openFramework(id) {
     }
 
     table.load(rows);
+
+    // Toggle empty vs table visibility
+    const hasData = Array.isArray(rows) && rows.length > 0;
+    if (hasData) {
+      // Ensure table visible
+      tableContainer.style.display = '';
+      const empty = tableHost.querySelector('.table-empty-list');
+      if (empty) empty.style.display = 'none';
+    } else {
+      // Show empty state, hide table
+      tableContainer.innerHTML = '';
+      tableContainer.style.display = 'none';
+      const empty = tableHost.querySelector('.table-empty-list');
+      if (empty) {
+        empty.style.display = '';
+        empty.classList.remove('hidden');
+      }
+    }
     // No additional fetch here; avoid calling /frameworks/:id on click
 
     // Clear the loading controller since we're done
@@ -295,7 +327,15 @@ async function openFramework(id) {
   } catch (err) {
     if (err && err.name === 'AbortError') return; // ignore aborted request
     notificationService.error(`Failed to load framework data: ${err.message}`);
-    tableHost.innerHTML = `<div class="alert alert-danger">Failed to load data: ${err.message}</div>`;
+    // On error, hide the table and show empty with error message
+    tableContainer.innerHTML = '';
+    tableContainer.style.display = 'none';
+    const empty = tableHost.querySelector('.table-empty-list');
+    if (empty) {
+      empty.style.display = '';
+      empty.classList.remove('hidden');
+      empty.innerHTML = `<div class="empty-list-content"><div class="empty-list-icon"></div><p class="empty-list-text">Failed to load data: ${UtilityService.sanitizeHtml(err.message)}</p></div>`;
+    }
     currentLoadingController = null;
   }
 }
@@ -323,13 +363,13 @@ function updatePageHeader(selectedName = null) {
     titleEl.textContent = selectedName ? `Compliance Frameworks: ${selectedName}` : 'Compliance Frameworks';
   }
 
-  const breadcrumbOl = document.querySelector('.info-header nav.breadcrumb ol.breadcrumb');
+  const breadcrumbOl = document.querySelector('.info-header nav.breadcrumb ol');
   if (breadcrumbOl) {
     const existing = breadcrumbOl.querySelector('li[aria-current="page"]');
     if (existing) existing.remove();
     if (selectedName) {
       const li = document.createElement('li');
-      li.className = 'breadcrumb-item';
+      li.className = 'crumb-item';
       li.setAttribute('aria-current', 'page');
       li.textContent = selectedName;
       breadcrumbOl.appendChild(li);
@@ -341,15 +381,13 @@ function updateTableHeader(framework) {
   const headerElement = document.querySelector('#tableHost .table-header');
   if (headerElement) {
     headerElement.innerHTML = `
-      <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="table-header-row">
         <div>
-          <h5 class="mb-1">${UtilityService.sanitizeHtml(framework.name)}</h5>
-          <p class="text-muted mb-0">${framework.controlCount || 0} control items</p>
+          <h5>${UtilityService.sanitizeHtml(framework.name)}</h5>
+          <p class="muted">${framework.controlCount || 0} control items</p>
         </div>
-        <div class="btn-group">
-          <button class="btn btn-outline-success btn-sm" onclick="addNewControlItem()">
-            <i class="bi bi-plus"></i> Add Control
-          </button>
+        <div class="button-group">
+          <button class="add-button" onclick="addNewControlItem()">Add Control</button>
         </div>
       </div>
     `;
@@ -440,36 +478,35 @@ function showControlItemEditModal(control = null) {
 
   // Create modal HTML
   const modalHtml = `
-    <div class="modal fade" id="controlItemModal" tabindex="-1" aria-labelledby="controlItemModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="controlItemModalLabel">${modalTitle}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
+    <div class="app-modal" id="controlItemModal" role="dialog" aria-modal="true" aria-labelledby="controlItemModalLabel">
+      <div class="app-modal-backdrop" data-close="true"></div>
+      <div class="app-modal-dialog">
+        <div class="app-modal-header">
+          <h5 class="app-modal-title" id="controlItemModalLabel">${modalTitle}</h5>
+          <button type="button" class="app-modal-close" data-close="true" aria-label="Close">×</button>
+        </div>
+        <div class="app-modal-body">
             <form id="controlItemForm">
-              <div class="mb-3">
-                <label for="controlId" class="form-label">Control ID *</label>
-                <input type="text" class="form-control" id="controlId" name="controlId" required
+              <div class="field">
+                <label for="controlId" class="input-label">Control ID *</label>
+                <input type="text" class="input-field" id="controlId" name="controlId" required
                        value="${control?.controlId || ''}" ${isEdit ? 'readonly' : ''}>
               </div>
-              <div class="mb-3">
-                <label for="controlCategory" class="form-label">Control Category *</label>
-                <input type="text" class="form-control" id="controlCategory" name="controlCategory" required
+              <div class="field">
+                <label for="controlCategory" class="input-label">Control Category *</label>
+                <input type="text" class="input-field" id="controlCategory" name="controlCategory" required
                        value="${control?.controlCategory || ''}" list="categoryDatalist">
                 <datalist id="categoryDatalist"></datalist>
               </div>
-              <div class="mb-3">
-                <label for="controlDescription" class="form-label">Control Description *</label>
-                <textarea class="form-control" id="controlDescription" name="controlDescription" rows="4" required>${control?.controlDescription || ''}</textarea>
+              <div class="field">
+                <label for="controlDescription" class="input-label">Control Description *</label>
+                <textarea class="input-field" id="controlDescription" name="controlDescription" rows="4" required>${control?.controlDescription || ''}</textarea>
               </div>
             </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" id="saveControlItemBtn">${isEdit ? 'Update' : 'Add'}</button>
-          </div>
+        </div>
+        <div class="app-modal-footer">
+          <button type="button" class="secondary-button" data-close="true">Cancel</button>
+          <button type="button" class="primary-button" id="saveControlItemBtn">${isEdit ? 'Update' : 'Add'}</button>
         </div>
       </div>
     </div>
@@ -484,8 +521,11 @@ function showControlItemEditModal(control = null) {
   // Add modal to DOM
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-  // Initialize modal
-  const modal = new bootstrap.Modal(document.getElementById('controlItemModal'));
+  // Show modal (custom)
+  const modalEl = document.getElementById('controlItemModal');
+  const closeModal = () => modalEl && modalEl.remove();
+  modalEl.addEventListener('click', (e) => { if (e.target.dataset.close === 'true') closeModal(); });
+  document.addEventListener('keydown', function onEsc(ev) { if (ev.key === 'Escape') { closeModal(); document.removeEventListener('keydown', onEsc); } });
 
   // Load categories for datalist
   loadControlCategories();
@@ -493,16 +533,10 @@ function showControlItemEditModal(control = null) {
   // Setup save handler
   document.getElementById('saveControlItemBtn').addEventListener('click', async () => {
     await saveControlItem(isEdit, control?.controlId);
-    modal.hide();
+    closeModal();
   });
 
-  // Show modal
-  modal.show();
-
-  // Clean up on hide
-  document.getElementById('controlItemModal').addEventListener('hidden.bs.modal', () => {
-    document.getElementById('controlItemModal').remove();
-  });
+  // No-op (modal is already visible by insertion); cleanup handled by closeModal
 }
 
 async function loadControlCategories() {
@@ -621,8 +655,8 @@ function updateFrameworkDetailsStep() {
         // Show file info
         const fileInfo = fileUploadService.getFileInfo(file);
         filePreview.innerHTML = `
-          <div class="alert alert-info">
-            <i class="bi bi-file-earmark"></i> 
+          <div class="file-info">
+            <span class="file-icon" aria-hidden="true">📄</span>
             <strong>${UtilityService.sanitizeHtml(fileInfo.name)}</strong><br>
             <small>Size: ${fileInfo.sizeFormatted}</small>
           </div>
@@ -697,13 +731,9 @@ function addItemToTable(item) {
     <td>${UtilityService.sanitizeHtml(item.controlId || '')}</td>
     <td>${UtilityService.sanitizeHtml(item.controlCategory || '')}</td>
     <td>${UtilityService.sanitizeHtml(item.controlDescription || '')}</td>
-    <td class="text-end">
-      <button class="btn btn-light btn-sm me-1" onclick="editTableItem(this)" title="Edit">
-        <i class="bi bi-pencil-square"></i>
-      </button>
-      <button class="btn btn-light btn-sm" onclick="deleteTableItem(this)" title="Delete">
-        <i class="bi bi-trash"></i>
-      </button>
+    <td class="cell-actions">
+      <button class="icon-btn" onclick="editTableItem(this)" title="Edit">✏️</button>
+      <button class="icon-btn" onclick="deleteTableItem(this)" title="Delete">🗑️</button>
     </td>
   `;
   tableBody.appendChild(tr);
@@ -730,33 +760,32 @@ window.deleteTableItem = function (button) {
 function showAddControlItemForm(item = null, rowToReplace = null) {
   const isEdit = !!item;
   const formHtml = `
-    <div class="modal fade" id="addControlModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">${isEdit ? 'Edit' : 'Add'} Control Item</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
+    <div class="app-modal" id="addControlModal" role="dialog" aria-modal="true">
+      <div class="app-modal-backdrop" data-close="true"></div>
+      <div class="app-modal-dialog">
+        <div class="app-modal-header">
+          <h5 class="app-modal-title">${isEdit ? 'Edit' : 'Add'} Control Item</h5>
+          <button type="button" class="app-modal-close" data-close="true" aria-label="Close">×</button>
+        </div>
+        <div class="app-modal-body">
             <form id="addControlForm">
-              <div class="mb-3">
-                <label class="form-label">Control ID *</label>
-                <input type="text" class="form-control" name="controlId" required value="${item?.controlId || ''}">
+              <div class="field">
+                <label class="input-label">Control ID *</label>
+                <input type="text" class="input-field" name="controlId" required value="${item?.controlId || ''}">
               </div>
-              <div class="mb-3">
-                <label class="form-label">Control Category *</label>
-                <input type="text" class="form-control" name="controlCategory" required value="${item?.controlCategory || ''}">
+              <div class="field">
+                <label class="input-label">Control Category *</label>
+                <input type="text" class="input-field" name="controlCategory" required value="${item?.controlCategory || ''}">
               </div>
-              <div class="mb-3">
-                <label class="form-label">Control Description *</label>
-                <textarea class="form-control" name="controlDescription" rows="3" required>${item?.controlDescription || ''}</textarea>
+              <div class="field">
+                <label class="input-label">Control Description *</label>
+                <textarea class="input-field" name="controlDescription" rows="3" required>${item?.controlDescription || ''}</textarea>
               </div>
             </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" onclick="saveControlToTable(${isEdit})">Save</button>
-          </div>
+        </div>
+        <div class="app-modal-footer">
+          <button type="button" class="secondary-button" data-close="true">Cancel</button>
+          <button type="button" class="primary-button" onclick="saveControlToTable(${isEdit})">Save</button>
         </div>
       </div>
     </div>
@@ -767,7 +796,10 @@ function showAddControlItemForm(item = null, rowToReplace = null) {
   if (existing) existing.remove();
 
   document.body.insertAdjacentHTML('beforeend', formHtml);
-  const modal = new bootstrap.Modal(document.getElementById('addControlModal'));
+  const modalEl = document.getElementById('addControlModal');
+  const closeModal = () => modalEl && modalEl.remove();
+  modalEl.addEventListener('click', (e) => { if (e.target.dataset.close === 'true') closeModal(); });
+  document.addEventListener('keydown', function onEsc(ev) { if (ev.key === 'Escape') { closeModal(); document.removeEventListener('keydown', onEsc); } });
 
   // Store row reference for editing
   if (rowToReplace) {
@@ -775,12 +807,7 @@ function showAddControlItemForm(item = null, rowToReplace = null) {
     document.getElementById('addControlModal')._rowToReplace = rowToReplace;
   }
 
-  modal.show();
-
-  // Cleanup on hide
-  document.getElementById('addControlModal').addEventListener('hidden.bs.modal', () => {
-    document.getElementById('addControlModal').remove();
-  });
+  // Modal is visible by insertion; cleanup handled by closeModal
 }
 
 window.saveControlToTable = function (isEdit) {
@@ -800,7 +827,7 @@ window.saveControlToTable = function (isEdit) {
     return;
   }
 
-  const modal = bootstrap.Modal.getInstance(document.getElementById('addControlModal'));
+  const modalEl = document.getElementById('addControlModal');
 
   if (isEdit && document.getElementById('addControlModal')._rowToReplace) {
     // Replace existing row
@@ -814,7 +841,7 @@ window.saveControlToTable = function (isEdit) {
     addItemToTable(item);
   }
 
-  modal.hide();
+  if (modalEl) modalEl.remove();
 };
 
 function updateReviewStep() {
@@ -858,16 +885,16 @@ function updateReviewStep() {
           <p><strong>${currentFrameworkData.controls.length}</strong> control items will be created</p>
           ${currentFrameworkData.controls.length > 0 ? `
             <div style="max-height: 200px; overflow-y: auto;">
-              <ul class="list-group list-group-flush">
+              <ul class="plain-list">
                 ${currentFrameworkData.controls.map(control =>
-      `<li class="list-group-item px-0 py-1">
+      `<li class="plain-list-item">
                     <small><strong>${UtilityService.sanitizeHtml(control.controlId)}</strong><br>
                     ${UtilityService.truncate(control.controlDescription, 60)}</small>
                   </li>`
     ).join('')}
               </ul>
             </div>
-          ` : '<p class="text-muted">No control items added</p>'}
+          ` : '<p class="muted">No control items added</p>'}
         </div>
       </div>
     `;
@@ -1008,12 +1035,6 @@ document.addEventListener('show.bs.modal', (e) => {
 });
 
 // Initialize tooltips
-document.addEventListener('DOMContentLoaded', () => {
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
-  });
-});
 
 // Error handling for uncaught errors
 window.addEventListener('error', (e) => {
