@@ -79,45 +79,6 @@ export class Api {
     return pick(await this._service(`/frameworks/${encodeURIComponent(id)}`, { abortable: true, signal }));
   }
 
-  async addControlItem(frameworkId, controlItem) {
-    const url = `${this.serviceBase}/controls`;
-    const payload = {
-      ...controlItem,
-      frameworkId // Include framework ID in the control item
-    };
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-
-  async updateControlItem(frameworkId, controlId, controlItem) {
-    const url = `${this.serviceBase}/controls/${encodeURIComponent(controlId)}`;
-    const payload = {
-      ...controlItem,
-      frameworkId // Include framework ID in the control item
-    };
-    const res = await fetch(url, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-
-  async deleteControlItem(frameworkId, controlId) {
-    const url = `${this.serviceBase}/controls/${encodeURIComponent(controlId)}`;
-    const res = await fetch(url, {
-      method: 'DELETE'
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-
   async uploadFrameworkTemplate(file) {
     const url = `${this.serviceBase}/frameworks/upload-template`;
     const formData = new FormData();

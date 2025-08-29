@@ -39,67 +39,6 @@ export class ControlItemService {
   }
 
   /**
-   * Add a new control item to a framework
-   */
-  async addControlItem(frameworkId, controlItem) {
-    const { controlId, controlCategory, controlDescription } = controlItem;
-
-    // Validate required fields
-    if (!controlId?.trim()) {
-      throw new Error('Control ID is required');
-    }
-    if (!controlCategory?.trim()) {
-      throw new Error('Control Category is required');
-    }
-    if (!controlDescription?.trim()) {
-      throw new Error('Control Description is required');
-    }
-
-    // Check for duplicate control ID
-    const existingControls = await this.api.getFrameworkRows(frameworkId);
-    if (existingControls.some(c => c.controlId === controlId.trim())) {
-      throw new Error(`Control ID "${controlId}" already exists in this framework`);
-    }
-
-    try {
-      const payload = {
-        controlId: controlId.trim(),
-        controlCategory: controlCategory.trim(),
-        controlDescription: controlDescription.trim()
-      };
-
-      const result = await this.api.addControlItem(frameworkId, payload);
-      return result;
-    } catch (error) {
-      throw new Error(`Failed to add control item: ${error.message}`);
-    }
-  }
-
-  /**
-   * Update an existing control item
-   */
-  async updateControlItem(frameworkId, controlId, updates) {
-    try {
-      const result = await this.api.updateControlItem(frameworkId, controlId, updates);
-      return result;
-    } catch (error) {
-      throw new Error(`Failed to update control item: ${error.message}`);
-    }
-  }
-
-  /**
-   * Delete a control item
-   */
-  async deleteControlItem(frameworkId, controlId) {
-    try {
-      const result = await this.api.deleteControlItem(frameworkId, controlId);
-      return result;
-    } catch (error) {
-      throw new Error(`Failed to delete control item: ${error.message}`);
-    }
-  }
-
-  /**
    * Get unique control categories for a framework
    */
   async getControlCategories(frameworkId) {
@@ -111,52 +50,5 @@ export class ControlItemService {
       throw new Error(`Failed to get control categories: ${error.message}`);
     }
   }
-
-  /**
-   * Bulk add control items
-   */
-  async bulkAddControlItems(frameworkId, controlItems) {
-    const results = [];
-    const errors = [];
-
-    for (const [index, item] of controlItems.entries()) {
-      try {
-        const result = await this.addControlItem(frameworkId, item);
-        results.push(result);
-      } catch (error) {
-        errors.push({ index, item, error: error.message });
-      }
-    }
-
-    return { results, errors };
-  }
-
-  /**
-   * Validate control item data
-   */
-  validateControlItem(controlItem) {
-    const errors = [];
-
-    if (!controlItem.controlId?.trim()) {
-      errors.push('Control ID is required');
-    }
-
-    if (!controlItem.controlCategory?.trim()) {
-      errors.push('Control Category is required');
-    }
-
-    if (!controlItem.controlDescription?.trim()) {
-      errors.push('Control Description is required');
-    }
-
-    // Validate Control ID format (optional - can be customized)
-    const controlIdPattern = /^[A-Za-z0-9\s\-._]+$/;
-    if (controlItem.controlId && !controlIdPattern.test(controlItem.controlId)) {
-      errors.push('Control ID contains invalid characters');
-    }
-
-    return errors;
-  }
-
 
 }
