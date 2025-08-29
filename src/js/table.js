@@ -1,6 +1,6 @@
 // A tiny, dependency-free data table with search, sort, and pagination.
 export class SimpleTable {
-  constructor(host, { columns, pageSize = 10, tableClass = 'custom-table', wrapperClass = 'custom-table-container', theadClass = '', externalInfoEl = null, externalPrevBtn = null, externalNextBtn = null, externalPagEl = null } = {}) {
+  constructor(host, { columns, pageSize = 10, tableClass = 'custom-table', wrapperClass = 'custom-table-container', theadClass = '', externalInfoEl = null, externalPrevBtn = null, externalNextBtn = null, externalPagEl = null, onReset = null } = {}) {
     this.host = host;
     this.columns = columns; // [{key,label,sortable}]
     this.pageSize = pageSize;
@@ -17,6 +17,8 @@ export class SimpleTable {
     this.externalPrevBtn = externalPrevBtn || null;
     this.externalNextBtn = externalNextBtn || null;
     this.externalPagEl = externalPagEl || null;
+    // Callback for resetting external UI elements
+    this.onReset = onReset;
 
     this._build();
   }
@@ -125,6 +127,13 @@ export class SimpleTable {
     this.data = Array.isArray(data) ? data : (data?.rows || []);
     this.filtered = [...this.data];
     this.currentPage = 1;
+    // Reset sort state to default
+    this.sortKey = null;
+    this.sortDir = 'asc';
+    // Call reset callback to clear external UI elements (like search input)
+    if (this.onReset) {
+      this.onReset();
+    }
     this._render();
   }
 

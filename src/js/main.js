@@ -296,6 +296,17 @@ async function openFramework(id) {
         theadClass: '',
         externalInfoEl: pageInfo,
         externalPagEl: pageNavContainer,
+        onReset: () => {
+          // Reset both search input and clear button when new data is loaded
+          const searchInput = document.getElementById('tableSearch');
+          const searchClearBtn = document.getElementById('searchClear');
+          if (searchInput) {
+            searchInput.value = '';
+          }
+          if (searchClearBtn) {
+            searchClearBtn.style.display = 'none';
+          }
+        }
       });
 
       // Setup table event handlers
