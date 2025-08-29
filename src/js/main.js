@@ -248,8 +248,10 @@ async function openFramework(id) {
     // Also unhide the container that wraps the toolbar
     if (tableCardBody) tableCardBody.classList.remove('hidden');
     // Hide empty state by default when loading
-    const emptyEl = tableHost.querySelector('.table-empty-list');
-    if (emptyEl) emptyEl.classList.add('hidden');
+    if (tableHost) {
+      tableHost.classList.add('hidden');
+      tableHost.style.display = 'none';
+    }
     // Update page title + breadcrumb using visible item title (short name)
     const itemEl = listEl.querySelector(`.framework-item[data-id="${id}"]`);
     const displayName = itemEl?.querySelector('.item-title')?.textContent?.trim() || id;
@@ -257,8 +259,10 @@ async function openFramework(id) {
 
     // Show loading state only if table is not already present
     if (!table || !tableContainer.contains(table.wrapper)) {
-      const empty = tableHost.querySelector('.table-empty-list');
-      if (empty) empty.style.display = 'none';
+      if (tableHost) {
+        tableHost.style.display = 'none';
+        tableHost.classList.add('hidden');
+      }
       tableContainer.style.display = '';
       tableContainer.innerHTML = '<div class="loading"><div class="spinner" aria-label="Loading"></div><div class="loading-text">Loading data...</div></div>';
     }
@@ -279,7 +283,7 @@ async function openFramework(id) {
     if (!table || !tableContainer.contains(table.wrapper)) {
       // Get the pagination container
       const pageNavContainer = document.getElementById('pageNav');
-      
+
       table = new SimpleTable(tableContainer, {
         columns: [
           { key: 'controlId', label: 'Control ID', sortable: true, width: '18%' },
@@ -305,18 +309,20 @@ async function openFramework(id) {
     // Toggle empty vs table visibility
     const hasData = Array.isArray(rows) && rows.length > 0;
     if (hasData) {
-      // Ensure table visible
+      // Show table, hide empty state
+      tableCardBody.classList.remove('hidden');
       tableContainer.style.display = '';
-      const empty = tableHost.querySelector('.table-empty-list');
-      if (empty) empty.style.display = 'none';
+      if (tableHost) {
+        tableHost.style.display = 'none';
+        tableHost.classList.add('hidden');
+      }
     } else {
       // Show empty state, hide table
-      tableContainer.innerHTML = '';
+      tableCardBody.classList.add('hidden');
       tableContainer.style.display = 'none';
-      const empty = tableHost.querySelector('.table-empty-list');
-      if (empty) {
-        empty.style.display = '';
-        empty.classList.remove('hidden');
+      if (tableHost) {
+        tableHost.style.display = 'block';
+        tableHost.classList.remove('hidden');
       }
     }
     // No additional fetch here; avoid calling /frameworks/:id on click
@@ -328,13 +334,13 @@ async function openFramework(id) {
     if (err && err.name === 'AbortError') return; // ignore aborted request
     notificationService.error(`Failed to load framework data: ${err.message}`);
     // On error, hide the table and show empty with error message
+    tableCardBody.classList.add('hidden');
     tableContainer.innerHTML = '';
     tableContainer.style.display = 'none';
-    const empty = tableHost.querySelector('.table-empty-list');
-    if (empty) {
-      empty.style.display = '';
-      empty.classList.remove('hidden');
-      empty.innerHTML = `<div class="empty-list-content"><div class="empty-list-icon"></div><p class="empty-list-text">Failed to load data: ${UtilityService.sanitizeHtml(err.message)}</p></div>`;
+    if (tableHost) {
+      tableHost.style.display = 'block';
+      tableHost.classList.remove('hidden');
+      tableHost.innerHTML = `<div class="empty-list-content"><div class="empty-list-icon"></div><p class="empty-list-text">Failed to load data: ${UtilityService.sanitizeHtml(err.message)}</p></div>`;
     }
     currentLoadingController = null;
   }

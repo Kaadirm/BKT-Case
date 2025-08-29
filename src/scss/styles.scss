@@ -556,6 +556,7 @@ body {
             overflow-x: auto;
             border: 1px solid $gray-200;
             border-radius: 8px;
+            height: 100%;
 
             .custom-table {
               width: 100%;
@@ -570,6 +571,9 @@ body {
                   padding: 12px 16px;
                   font-weight: 600;
                   color: $gray-900;
+                  font-size: 14px;
+                  line-height: 21px;
+
                 }
               }
 
@@ -591,9 +595,17 @@ body {
 
                   td {
                     padding: 16px;
+                    vertical-align: middle;
+                    font-size: 14px;
+                    color: $gray-700;
+                    line-height: 21px;
 
                     &:first-child {
-                      min-width: 116px;
+                      min-width: 127px;
+                    }
+
+                    &:nth-child(2) {
+                      min-width: 210px;
                     }
                   }
                 }
@@ -687,9 +699,9 @@ body {
                   }
 
                   &.is-disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                    color: $gray-400;
+                    // opacity: 0.5;
+                    cursor: default;
+                    // color: $gray-400;
                   }
                 }
 
