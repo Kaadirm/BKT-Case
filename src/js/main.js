@@ -20,6 +20,7 @@ const tableHost = document.getElementById('tableHost');
 const tableContainer = document.getElementById('tableContainer');
 const tableToolbar = document.getElementById('tableToolbar');
 const tableCardBody = document.querySelector('.table-card-body');
+const tableCard = document.querySelector('.table-card');
 const searchInput = document.getElementById('tableSearch');
 const pageSizeSelect = document.getElementById('pageSize');
 const pageInfo = document.getElementById('pageInfo');
@@ -248,6 +249,9 @@ function activateItem(id) {
 
 async function openFramework(id) {
   try {
+    // Get DOM elements once at the beginning
+    const noDataState = document.getElementById('noDataState');
+
     // Abort any previous loading operation
     if (currentLoadingController) {
       currentLoadingController.abort();
@@ -256,27 +260,67 @@ async function openFramework(id) {
 
     currentFrameworkId = id;
     activateItem(id);
-    tableToolbar.classList.remove('hidden');
-    // Also unhide the container that wraps the toolbar
-    if (tableCardBody) tableCardBody.classList.remove('hidden');
-    // Hide empty state by default when loading
+
+    // Hide both empty states by default when loading
     if (tableHost) {
       tableHost.classList.add('hidden');
       tableHost.style.display = 'none';
     }
+    if (noDataState) {
+      noDataState.classList.add('hidden');
+      noDataState.style.display = 'none';
+    }
+
+    // Initially hide table elements until we know if we have data
+    if (tableCardBody) tableCardBody.classList.add('hidden');
+    if (tableToolbar) tableToolbar.classList.add('hidden');
+
     // Update page title + breadcrumb using visible item title (short name)
     const itemEl = listEl.querySelector(`.framework-item[data-id="${id}"]`);
     const displayName = itemEl?.querySelector('.item-title')?.textContent?.trim() || id;
     updatePageHeader(displayName);
 
-    // Show loading state only if table is not already present
-    if (!table || !tableContainer.contains(table.wrapper)) {
-      if (tableHost) {
-        tableHost.style.display = 'none';
-        tableHost.classList.add('hidden');
+    // Always show loading state when fetching data
+    if (tableHost) {
+      tableHost.style.display = 'none';
+      tableHost.classList.add('hidden');
+    }
+    if (noDataState) {
+      noDataState.style.display = 'none';
+      noDataState.classList.add('hidden');
+    }
+
+    // Hide table card body content and show loading overlay
+    if (tableCardBody) tableCardBody.classList.add('hidden');
+
+    // Create and show loading overlay in table card
+    if (tableCard) {
+      // Remove any existing loading overlay
+      const existingOverlay = tableCard.querySelector('.loading-overlay');
+      if (existingOverlay) {
+        existingOverlay.remove();
       }
-      tableContainer.style.display = '';
-      tableContainer.innerHTML = '<div class="loading"><div class="spinner" aria-label="Loading"></div><div class="loading-text">Loading data...</div></div>';
+
+      // Create loading overlay
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'loading-overlay';
+      loadingOverlay.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.9);
+        z-index: 10;
+      `;
+      loadingOverlay.innerHTML = '<div class="loading"><div class="spinner" aria-label="Loading"></div></div>';
+
+      // Ensure table card has relative positioning
+      tableCard.style.position = 'relative';
+      tableCard.appendChild(loadingOverlay);
     }
 
     // Create abort controller for this request
@@ -291,81 +335,107 @@ async function openFramework(id) {
       return;
     }
 
-    // Build table if needed or if previous DOM was replaced
-    if (!table || !tableContainer.contains(table.wrapper)) {
-      // Get the pagination container
-      const pageNavContainer = document.getElementById('pageNav');
-
-      table = new SimpleTable(tableContainer, {
-        columns: [
-          { key: 'controlId', label: 'Control ID', sortable: true, width: '18%' },
-          { key: 'controlCategory', label: 'Control Category', sortable: true, width: '26%' },
-          { key: 'controlDescription', label: 'Control Description', sortable: false, width: 'auto' }
-        ],
-        pageSize: parseInt(pageSizeSelect.value, 10),
-        tableClass: 'custom-table',
-        wrapperClass: 'custom-table-container',
-        theadClass: '',
-        externalInfoEl: pageInfo,
-        externalPagEl: pageNavContainer,
-        onReset: () => {
-          // Reset both search input and clear button when new data is loaded
-          const searchInput = document.getElementById('tableSearch');
-          const searchClearBtn = document.getElementById('searchClear');
-          if (searchInput) {
-            searchInput.value = '';
-          }
-          if (searchClearBtn) {
-            searchClearBtn.style.display = 'none';
-          }
-        }
-      });
-
-      // Setup table event handlers
-      const debouncedFilter = UtilityService.debounce((value) => table.filter(value), 300);
-      const searchClearBtn = document.getElementById('searchClear');
-
-      // Search input handler
-      searchInput.addEventListener('input', (e) => {
-        const value = e.target.value;
-        debouncedFilter(value);
-
-        // Show/hide clear button
-        if (searchClearBtn) {
-          searchClearBtn.style.display = value ? 'flex' : 'none';
-        }
-      });
-
-      // Clear search handler
-      if (searchClearBtn) {
-        searchClearBtn.addEventListener('click', () => {
-          searchInput.value = '';
-          table.filter('');
-          searchClearBtn.style.display = 'none';
-          searchInput.focus();
-        });
-      }
-    }
-
-    table.load(rows);
-
-    // Toggle empty vs table visibility
+    // Check if we have data first
     const hasData = Array.isArray(rows) && rows.length > 0;
+
     if (hasData) {
-      // Show table, hide empty state
+      // We have data - build table if needed and show it
+      if (!table || !tableContainer.contains(table.wrapper)) {
+        // Get the pagination container
+        const pageNavContainer = document.getElementById('pageNav');
+
+        table = new SimpleTable(tableContainer, {
+          columns: [
+            { key: 'controlId', label: 'Control ID', sortable: true, width: '18%' },
+            { key: 'controlCategory', label: 'Control Category', sortable: true, width: '26%' },
+            { key: 'controlDescription', label: 'Control Description', sortable: false, width: 'auto' }
+          ],
+          pageSize: parseInt(pageSizeSelect.value, 10),
+          tableClass: 'custom-table',
+          wrapperClass: 'custom-table-container',
+          theadClass: '',
+          externalInfoEl: pageInfo,
+          externalPagEl: pageNavContainer,
+          onReset: () => {
+            // Reset both search input and clear button when new data is loaded
+            const searchInput = document.getElementById('tableSearch');
+            const searchClearBtn = document.getElementById('searchClear');
+            if (searchInput) {
+              searchInput.value = '';
+            }
+            if (searchClearBtn) {
+              searchClearBtn.style.display = 'none';
+            }
+          }
+        });
+
+        // Setup table event handlers
+        const debouncedFilter = UtilityService.debounce((value) => table.filter(value), 300);
+        const searchClearBtn = document.getElementById('searchClear');
+
+        // Search input handler
+        searchInput.addEventListener('input', (e) => {
+          const value = e.target.value;
+          debouncedFilter(value);
+
+          // Show/hide clear button
+          if (searchClearBtn) {
+            searchClearBtn.style.display = value ? 'flex' : 'none';
+          }
+        });
+
+        // Clear search handler
+        if (searchClearBtn) {
+          searchClearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            table.filter('');
+            searchClearBtn.style.display = 'none';
+            searchInput.focus();
+          });
+        }
+      }
+
+      table.load(rows);
+
+      // Remove loading overlay and show table content
+      if (tableCard) {
+        const loadingOverlay = tableCard.querySelector('.loading-overlay');
+        if (loadingOverlay) {
+          loadingOverlay.remove();
+        }
+      }
+
+      // Show table and toolbar, hide both empty states
       tableCardBody.classList.remove('hidden');
+      tableToolbar.classList.remove('hidden');
       tableContainer.style.display = '';
       if (tableHost) {
         tableHost.style.display = 'none';
         tableHost.classList.add('hidden');
       }
+      if (noDataState) {
+        noDataState.style.display = 'none';
+        noDataState.classList.add('hidden');
+      }
     } else {
-      // Show empty state, hide table
+      // No data - remove loading overlay and show "no data" state
+      if (tableCard) {
+        const loadingOverlay = tableCard.querySelector('.loading-overlay');
+        if (loadingOverlay) {
+          loadingOverlay.remove();
+        }
+      }
+
       tableCardBody.classList.add('hidden');
+      tableToolbar.classList.add('hidden');
       tableContainer.style.display = 'none';
       if (tableHost) {
-        tableHost.style.display = 'block';
-        tableHost.classList.remove('hidden');
+        tableHost.style.display = 'none';
+        tableHost.classList.add('hidden');
+      }
+      if (noDataState) {
+        noDataState.style.display = 'block';
+        noDataState.classList.remove('hidden');
       }
     }
     // No additional fetch here; avoid calling /frameworks/:id on click
@@ -468,8 +538,29 @@ window.addEventListener('popstate', () => {
   if (id) {
     openFramework(id);
   } else {
+    // No framework selected - reset to initial state
     currentFrameworkId = null;
     updatePageHeader(null);
+
+    // Hide table and show "select framework" state
+    const noDataState = document.getElementById('noDataState');
+    if (tableCardBody) tableCardBody.classList.add('hidden');
+    if (tableContainer) tableContainer.style.display = 'none';
+    if (tableToolbar) tableToolbar.classList.add('hidden');
+
+    // Show the initial "select framework" state
+    if (tableHost) {
+      tableHost.style.display = 'block';
+      tableHost.classList.remove('hidden');
+    }
+    // Hide the "no data" state
+    if (noDataState) {
+      noDataState.style.display = 'none';
+      noDataState.classList.add('hidden');
+    }
+
+    // Clear active framework selection
+    listEl.querySelectorAll('.framework-item').forEach(el => el.classList.remove('active'));
   }
 });
 
@@ -581,8 +672,23 @@ function showControlItemEditModal(control = null) {
 
   // Setup save handler
   document.getElementById('saveControlItemBtn').addEventListener('click', async () => {
-    await saveControlItem(isEdit, control?.controlId);
-    closeModal();
+    const saveBtn = document.getElementById('saveControlItemBtn');
+    const originalText = saveBtn.textContent;
+
+    // Show loading state
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="btn-spinner"></span> Saving...';
+
+    try {
+      await saveControlItem(isEdit, control?.controlId);
+      closeModal();
+    } catch (error) {
+      // Error handling is done in saveControlItem
+    } finally {
+      // Reset button state
+      saveBtn.disabled = false;
+      saveBtn.textContent = originalText;
+    }
   });
 
   // No-op (modal is already visible by insertion); cleanup handled by closeModal
@@ -1106,8 +1212,27 @@ async function initializeApp() {
     await loadFrameworks();
     // If URL already points to a framework, open it
     const initialId = getRouteFrameworkId();
-    if (initialId) openFramework(initialId);
-    else updatePageHeader(null);
+    if (initialId) {
+      openFramework(initialId);
+    } else {
+      // No framework selected on initial load - ensure correct empty state is shown
+      updatePageHeader(null);
+      const noDataState = document.getElementById('noDataState');
+
+      // Show the initial "select framework" state
+      if (tableHost) {
+        tableHost.style.display = 'block';
+        tableHost.classList.remove('hidden');
+      }
+      // Hide the "no data" state
+      if (noDataState) {
+        noDataState.style.display = 'none';
+        noDataState.classList.add('hidden');
+      }
+      // Hide table related elements
+      if (tableCardBody) tableCardBody.classList.add('hidden');
+      if (tableToolbar) tableToolbar.classList.add('hidden');
+    }
 
     // Show welcome message for first-time users
     const hasVisited = UtilityService.getStorageWithExpiry('hasVisitedApp');

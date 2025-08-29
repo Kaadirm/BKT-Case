@@ -21,12 +21,12 @@
     }
 
     &::-webkit-scrollbar-thumb {
-        background: rgba($info-500, 0.8);
+        background: rgba($brand-100, 0.8);
         border-radius: 4px;
         transition: background 0.2s ease;
 
         &:hover {
-            background: $info-500;
+            background: $brand-500;
         }
     }
 
@@ -35,7 +35,7 @@
     }
 
     /* Firefox scrollbar */
-    scrollbar-color: rgba($info-500, 0.8) rgba($color-surface, 0.5);
+    scrollbar-color: rgba($brand-100, 0.8) rgba($color-surface, 0.5);
     scrollbar-width: thin;
 
     .table-card {
