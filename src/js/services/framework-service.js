@@ -6,31 +6,10 @@ export class FrameworkService {
   }
 
   /**
-   * Get all frameworks with optional filtering and sorting
+   * Get all frameworks 
    */
-  async getFrameworks(options = {}) {
-    const { search, status, sortBy = 'name', sortOrder = 'asc' } = options;
-    let frameworks = await this.api.getFrameworks();
-
-    // Apply search filter
-    if (search) {
-      frameworks = await this.api.searchFrameworks(search);
-    }
-
-    // Apply status filter
-    if (status && status !== 'all') {
-      frameworks = frameworks.filter(f => f.status === status);
-    }
-
-    // Apply sorting
-    frameworks.sort((a, b) => {
-      const aVal = a[sortBy] || '';
-      const bVal = b[sortBy] || '';
-      const comparison = aVal.localeCompare(bVal, undefined, { numeric: true });
-      return sortOrder === 'desc' ? -comparison : comparison;
-    });
-
-    return frameworks;
+  async getFrameworks() {
+    return await this.api.getFrameworks();
   }
 
   /**

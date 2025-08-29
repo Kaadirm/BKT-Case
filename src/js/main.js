@@ -24,6 +24,7 @@ const pageSizeSelect = document.getElementById('pageSize');
 let table;
 let currentFrameworkId = null;
 let currentLoadingController = null;
+let currentFrameworksController = null;
 
 function renderFrameworkItem(item) {
   const li = document.createElement('li');
@@ -199,7 +200,13 @@ async function loadFrameworks(options = {}) {
     // Show skeleton loading state
     showSkeletonLoading(8);
 
-    const items = await frameworkService.getFrameworks(options);
+    // Cancel any in-flight list load
+    if (currentFrameworksController) {
+      currentFrameworksController.abort();
+      currentFrameworksController = null;
+    }
+    currentFrameworksController = new AbortController();
+    const items = await frameworkService.getFrameworks();
 
     // Clear skeleton items
     listEl.innerHTML = '';
@@ -212,6 +219,7 @@ async function loadFrameworks(options = {}) {
       listEl.innerHTML = '<li class="text-center text-muted p-3">No frameworks found</li>';
     }
   } catch (err) {
+    if (err && err.name === 'AbortError') return;
     notificationService.error(`Failed to load frameworks: ${err.message}`);
     listEl.innerHTML = `<li class="text-danger p-3">Failed to load frameworks: ${err.message}</li>`;
   }
@@ -936,24 +944,7 @@ function resetFrameworkForm() {
 }
 
 // Search functionality
-const frameworkSearchInput = document.getElementById('frameworkSearch');
-if (frameworkSearchInput) {
-  const debouncedSearch = UtilityService.debounce(async (searchTerm) => {
-    await loadFrameworks({ search: searchTerm });
-  }, 300);
-
-  frameworkSearchInput.addEventListener('input', (e) => {
-    debouncedSearch(e.target.value);
-  });
-}
-
-// Status filter functionality
-const statusFilter = document.getElementById('statusFilter');
-if (statusFilter) {
-  statusFilter.addEventListener('change', async (e) => {
-    await loadFrameworks({ status: e.target.value });
-  });
-}
+// Framework search/status removed: filtering belongs to controls only.
 
 // Help functionality
 const helpBtn = document.getElementById('helpBtn');

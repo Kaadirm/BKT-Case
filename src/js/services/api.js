@@ -29,9 +29,10 @@ export class Api {
   }
 
   async _service(path, opts) { return this._fetch(`${this.serviceBase}${path}`, opts); }
-  async getFrameworks() {
+  async getFrameworks(options = {}) {
+    const { signal } = options;
     const pick = (res) => Array.isArray(res) ? res : (res?.data ?? res?.items ?? res?.rows ?? []);
-    return pick(await this._service('/frameworks'));
+    return pick(await this._service('/frameworks', { abortable: true, signal }));
   }
 
   async getFrameworkRows(id, options = {}) {
@@ -72,9 +73,10 @@ export class Api {
     return res.json();
   }
 
-  async getFrameworkById(id) {
+  async getFrameworkById(id, options = {}) {
+    const { signal } = options;
     const pick = (res) => res?.data ?? res;
-    return pick(await this._service(`/frameworks/${encodeURIComponent(id)}`));
+    return pick(await this._service(`/frameworks/${encodeURIComponent(id)}`, { abortable: true, signal }));
   }
 
   async addControlItem(frameworkId, controlItem) {
@@ -128,17 +130,6 @@ export class Api {
     return res.json();
   }
 
-  async searchFrameworks(query) {
-    const frameworks = await this.getFrameworks();
-    if (!query) return frameworks;
-
-    const searchTerm = query.toLowerCase();
-    return frameworks.filter(framework =>
-      framework.name?.toLowerCase().includes(searchTerm) ||
-      framework.subtitle?.toLowerCase().includes(searchTerm) ||
-      framework.description?.toLowerCase().includes(searchTerm)
-    );
-  }
 
   async getFrameworkStatistics() {
     const url = `${this.serviceBase}/frameworks/statistics`;
