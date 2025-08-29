@@ -3,7 +3,6 @@ export { Api } from './api.js';
 export { FrameworkService } from './framework-service.js';
 export { ControlItemService } from './control-item-service.js';
 export { FileUploadService } from './file-upload-service.js';
-export { NotificationService } from './notification-service.js';
 export { UtilityService } from './utility-service.js';
 
 // Service factory for creating configured service instances
@@ -18,7 +17,6 @@ export class ServiceFactory {
     this._frameworkService = null;
     this._controlItemService = null;
     this._fileUploadService = null;
-    this._notificationService = null;
   }
 
   get api() {
@@ -50,13 +48,6 @@ export class ServiceFactory {
     return this._fileUploadService;
   }
 
-  get notificationService() {
-    if (!this._notificationService) {
-      this._notificationService = new NotificationService();
-    }
-    return this._notificationService;
-  }
-
   get utilityService() {
     return UtilityService; // Static class
   }
@@ -67,7 +58,6 @@ export class ServiceFactory {
     this._frameworkService = null;
     this._controlItemService = null;
     this._fileUploadService = null;
-    this._notificationService = null;
   }
 
   // Update configuration

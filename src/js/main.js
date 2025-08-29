@@ -1,10 +1,9 @@
-import { Stepper } from './stepper.js';
+import { createStepper, getStepper } from './stepper.js';
 import { SimpleTable } from './table.js';
 import { Api } from './services/api.js';
 import { FrameworkService } from './services/framework-service.js';
 import { ControlItemService } from './services/control-item-service.js';
 import { FileUploadService } from './services/file-upload-service.js';
-import { NotificationService } from './services/notification-service.js';
 import { UtilityService } from './services/utility-service.js';
 
 // Initialize services
@@ -12,7 +11,6 @@ const api = new Api({ serviceBase: 'https://bk-backend.vercel.app/api/v1' });
 const frameworkService = new FrameworkService(api);
 const controlItemService = new ControlItemService(api);
 const fileUploadService = new FileUploadService();
-const notificationService = new NotificationService();
 
 // Framework list + table init
 const listEl = document.getElementById('frameworkList');
@@ -238,7 +236,6 @@ async function loadFrameworks(options = {}) {
     }
   } catch (err) {
     if (err && err.name === 'AbortError') return;
-    notificationService.error(`Failed to load frameworks: ${err.message}`);
     listEl.innerHTML = `<li class="list-error">Failed to load frameworks: ${err.message}</li>`;
   }
 }
@@ -445,7 +442,6 @@ async function openFramework(id) {
 
   } catch (err) {
     if (err && err.name === 'AbortError') return; // ignore aborted request
-    notificationService.error(`Failed to load framework data: ${err.message}`);
     // On error, hide the table and show empty with error message
     tableCardBody.classList.add('hidden');
     tableContainer.innerHTML = '';
@@ -496,23 +492,6 @@ function updatePageHeader(selectedName = null) {
       li.appendChild(anchor);
       breadcrumbOl.appendChild(li);
     }
-  }
-}
-
-function updateTableHeader(framework) {
-  const headerElement = document.querySelector('#tableHost .table-header');
-  if (headerElement) {
-    headerElement.innerHTML = `
-      <div class="table-header-row">
-        <div>
-          <h5>${UtilityService.sanitizeHtml(framework.name)}</h5>
-          <p class="muted">${framework.controlCount || 0} control items</p>
-        </div>
-        <div class="button-group">
-          <button class="add-button" onclick="addNewControlItem()">Add Control</button>
-        </div>
-      </div>
-    `;
   }
 }
 
@@ -571,43 +550,23 @@ window.addEventListener('popstate', () => {
 window.editControlItem = async function (controlId) {
   if (!currentFrameworkId) return;
 
-  try {
-    const controls = await controlItemService.getControlItems(currentFrameworkId);
-    const control = controls.find(c => c.controlId === controlId);
+  const controls = await controlItemService.getControlItems(currentFrameworkId);
+  const control = controls.find(c => c.controlId === controlId);
 
-    if (!control) {
-      notificationService.error('Control item not found');
-      return;
-    }
-
-    // Show edit modal or inline editing
-    showControlItemEditModal(control);
-  } catch (error) {
-    notificationService.error(`Failed to load control item: ${error.message}`);
+  if (!control) {
+    return;
   }
+
+  // Show edit modal or inline editing
+  showControlItemEditModal(control);
 };
 
 window.deleteControlItem = async function (controlId) {
   if (!currentFrameworkId) return;
 
-  const confirmed = await notificationService.confirm(
-    `Are you sure you want to delete control item "${controlId}"?`,
-    { title: 'Delete Control Item', confirmLabel: 'Delete', type: 'danger' }
-  );
-
-  if (!confirmed) return;
-
-  try {
-    const loadingNotification = notificationService.loading('Deleting control item...');
-    await controlItemService.deleteControlItem(currentFrameworkId, controlId);
-    notificationService.hide(loadingNotification);
-    notificationService.success('Control item deleted successfully');
-
-    // Refresh table
-    await openFramework(currentFrameworkId);
-  } catch (error) {
-    notificationService.error(`Failed to delete control item: ${error.message}`);
-  }
+  await controlItemService.deleteControlItem(currentFrameworkId, controlId);
+  // Refresh table
+  await openFramework(currentFrameworkId);
 };
 
 window.addNewControlItem = function () {
@@ -725,61 +684,133 @@ async function saveControlItem(isEdit, originalControlId) {
   // Validate
   const errors = controlItemService.validateControlItem(controlItem);
   if (errors.length > 0) {
-    notificationService.showValidationErrors(errors, form);
     return;
   }
 
-  try {
-    const loadingNotification = notificationService.loading(isEdit ? 'Updating control item...' : 'Adding control item...');
-
-    if (isEdit) {
-      await controlItemService.updateControlItem(currentFrameworkId, originalControlId, controlItem);
-      notificationService.hide(loadingNotification);
-      notificationService.success('Control item updated successfully');
-    } else {
-      await controlItemService.addControlItem(currentFrameworkId, controlItem);
-      notificationService.hide(loadingNotification);
-      notificationService.success('Control item added successfully');
-    }
-
-    // Refresh table
-    await openFramework(currentFrameworkId);
-  } catch (error) {
-    notificationService.error(`Failed to ${isEdit ? 'update' : 'add'} control item: ${error.message}`);
+  if (isEdit) {
+    await controlItemService.updateControlItem(currentFrameworkId, originalControlId, controlItem);
+  } else {
+    await controlItemService.addControlItem(currentFrameworkId, controlItem);
   }
+
+  // Refresh table
+  await openFramework(currentFrameworkId);
 }
 
-// Modal stepper wiring for final Save button visibility
-const stepperRoot = document.getElementById('frameworkStepper');
-let modalStepper;
+// Modal stepper wiring - using functional approach
 let currentFrameworkData = {};
 let uploadedTemplate = null;
 
 function ensureStepperInstance() {
-  if (stepperRoot && !modalStepper) {
-    modalStepper = new Stepper(stepperRoot, {
+  const stepperRoot = document.getElementById('frameworkStepper');
+  if (!stepperRoot) return null;
+
+  // Check if stepper already exists
+  let stepper = getStepper(stepperRoot);
+  if (!stepper) {
+    // Create new stepper with functional approach
+    stepper = createStepper(stepperRoot, {
       onChange: (from, to) => {
-        // Update step badges
-        const badges = stepperRoot.querySelectorAll('.step-badge');
-        badges.forEach((badge, index) => {
-          badge.classList.toggle('active', index + 1 === to);
-        });
-
-        // Update step indicator text
-        const stepIndicator = document.querySelector('.step-indicator');
-        if (stepIndicator) {
-          stepIndicator.textContent = `${to}/3`;
-        }
-
-        document.getElementById('saveFrameworkBtn').classList.toggle('hidden', to !== 2);
-        const nextBtn = document.querySelector('[data-stepper-control="next"][data-stepper-target="#frameworkStepper"]');
-        if (nextBtn) nextBtn.classList.toggle('hidden', to === 2);
-
-        // Update step content based on current step
+        updateModalTitle(to);
+        updateModalButtons(to);
         updateStepContent(to);
+      },
+      onValidate: (from, to) => {
+        // Custom validation for framework modal
+        if (to > from) {
+          switch (from) {
+            case 1: // Framework Details step
+              return validateFrameworkDetails();
+            case 2: // Control Items step
+              return validateControlItems();
+            default:
+              return true;
+          }
+        }
+        return true;
+      },
+      onBeforeStepChange: (from, to) => {
+        // Save current step data before moving
+        saveCurrentStepData(from);
+        return true;
       }
     });
-    stepperRoot.__stepperInstance = modalStepper;
+  }
+  return stepper;
+}
+
+function updateModalTitle(step) {
+  const modalTitle = document.getElementById('newFrameworkModalLabel');
+  const stepIndicator = modalTitle?.querySelector('.step-indicator');
+
+  if (stepIndicator) {
+    stepIndicator.textContent = `${step}/2`;
+  }
+}
+
+function updateModalButtons(step) {
+  const saveBtn = document.getElementById('saveFrameworkBtn');
+  const nextBtn = document.querySelector('[data-stepper-control="next"][data-stepper-target="#frameworkStepper"]');
+  const prevBtn = document.querySelector('[data-stepper-control="prev"][data-stepper-target="#frameworkStepper"]');
+
+  if (saveBtn) {
+    saveBtn.classList.toggle('hidden', step !== 2);
+  }
+
+  if (nextBtn) {
+    nextBtn.classList.toggle('hidden', step === 2);
+    // Update button text based on step
+    const buttonText = step === 1 ? 'Next › Control Items' : 'Next';
+    nextBtn.innerHTML = buttonText;
+  }
+
+  if (prevBtn) {
+    prevBtn.style.display = step === 1 ? 'none' : 'inline-block';
+  }
+}
+
+function validateFrameworkDetails() {
+  const form = document.getElementById('frameworkForm');
+  if (!form) return true;
+
+  const isValid = form.checkValidity();
+  if (!isValid) {
+    // Show validation errors
+    const invalidInputs = form.querySelectorAll(':invalid');
+    invalidInputs.forEach(input => {
+      input.classList.add('invalid');
+      const errorEl = input.parentElement.querySelector('.form-error');
+      if (errorEl) {
+        errorEl.classList.add('visible');
+      }
+    });
+  }
+  return isValid;
+}
+
+function validateControlItems() {
+  // For now, always allow moving from control items step
+  // Add validation logic here if needed
+  return true;
+}
+
+function saveCurrentStepData(step) {
+  switch (step) {
+    case 1: // Framework Details
+      const form = document.getElementById('frameworkForm');
+      if (form) {
+        const formData = new FormData(form);
+        currentFrameworkData = {
+          ...currentFrameworkData,
+          name: formData.get('name'),
+          shortName: formData.get('shortName'),
+          description: formData.get('description')
+        };
+      }
+      break;
+    case 2: // Control Items
+      // Save control items data if needed
+      break;
   }
 }
 
@@ -816,34 +847,28 @@ function updateFrameworkDetailsStep() {
       // Validate file
       const errors = fileUploadService.validateFile(file, 'template');
       if (errors.length > 0) {
-        notificationService.showValidationErrors(errors);
         fileInput.value = '';
         return;
       }
 
-      try {
-        // Show file info
-        const fileInfo = fileUploadService.getFileInfo(file);
-        filePreview.innerHTML = `
-          <div class="file-info">
-            <span class="file-icon" aria-hidden="true">📄</span>
-            <strong>${UtilityService.sanitizeHtml(fileInfo.name)}</strong><br>
-            <small>Size: ${fileInfo.sizeFormatted}</small>
-          </div>
-        `;
+      // Show file info
+      const fileInfo = fileUploadService.getFileInfo(file);
+      filePreview.innerHTML = `
+        <div class="file-info">
+          <span class="file-icon" aria-hidden="true">📄</span>
+          <strong>${UtilityService.sanitizeHtml(fileInfo.name)}</strong><br>
+          <small>Size: ${fileInfo.sizeFormatted}</small>
+        </div>
+      `;
 
-        uploadedTemplate = file;
+      uploadedTemplate = file;
 
-        // Try to parse template for control items
-        if (file.name.endsWith('.csv') || file.name.endsWith('.json')) {
-          const content = await fileUploadService.readFile(file);
-          if (Array.isArray(content)) {
-            currentFrameworkData.controlsFromTemplate = content;
-            notificationService.info(`Found ${content.length} control items in template`);
-          }
+      // Try to parse template for control items
+      if (file.name.endsWith('.csv') || file.name.endsWith('.json')) {
+        const content = await fileUploadService.readFile(file);
+        if (Array.isArray(content)) {
+          currentFrameworkData.controlsFromTemplate = content;
         }
-      } catch (error) {
-        notificationService.error(`Failed to process template: ${error.message}`);
       }
     });
   }
@@ -993,7 +1018,6 @@ window.saveControlToTable = function (isEdit) {
   // Validate
   const errors = controlItemService.validateControlItem(item);
   if (errors.length > 0) {
-    notificationService.showValidationErrors(errors, form);
     return;
   }
 
@@ -1077,46 +1101,43 @@ ensureStepperInstance();
 const saveBtn = document.getElementById('saveFrameworkBtn');
 if (saveBtn) {
   saveBtn.addEventListener('click', async () => {
-    try {
-      // Validate framework data
-      if (!currentFrameworkData.name?.trim()) {
-        notificationService.error('Framework name is required');
-        return;
-      }
-
-      if (!currentFrameworkData.shortName?.trim()) {
-        notificationService.error('Framework short name is required');
-        return;
-      }
-
-      const progressNotification = notificationService.progress('Creating framework...', 0);
-
-      // Create framework
-      progressNotification.updateProgress(20, 'Creating framework...');
-      const result = await frameworkService.createFramework(currentFrameworkData);
-
-      progressNotification.updateProgress(80, 'Framework created successfully');
-
-      // Refresh list after create
-      await loadFrameworks();
-
-      progressNotification.complete('Framework created successfully!');
-
-      // Close modal
-      closeNewFrameworkModal();
-
-      // Reset form
-      resetFrameworkForm();
-
-    } catch (error) {
-      notificationService.error(`Failed to create framework: ${error.message}`);
+    // Validate framework data
+    if (!currentFrameworkData.name?.trim()) {
+      return;
     }
+
+    if (!currentFrameworkData.shortName?.trim()) {
+      return;
+    }
+
+    // Create framework
+    const result = await frameworkService.createFramework(currentFrameworkData);
+
+    // Refresh list after create
+    await loadFrameworks();
+
+    // Close modal
+    closeNewFrameworkModal();
+
+    // Reset form
+    resetFrameworkForm();
   });
 }
 
 function resetFrameworkForm() {
   const form = document.getElementById('frameworkForm');
-  if (form) form.reset();
+  if (form) {
+    form.reset();
+    // Clear validation errors
+    const invalidInputs = form.querySelectorAll('.invalid');
+    invalidInputs.forEach(input => {
+      input.classList.remove('invalid');
+      const errorEl = input.parentElement.querySelector('.form-error');
+      if (errorEl) {
+        errorEl.classList.remove('visible');
+      }
+    });
+  }
 
   const tableBody = document.querySelector('#newFwItemsTable tbody');
   if (tableBody) tableBody.innerHTML = '';
@@ -1127,42 +1148,17 @@ function resetFrameworkForm() {
   currentFrameworkData = {};
   uploadedTemplate = null;
 
-  // Reset stepper to first step
-  if (modalStepper) {
-    modalStepper.go(1);
-  }
+  // Reset stepper to first step will be handled by openModal function
 }
 
 // Search functionality
 // Framework search/status removed: filtering belongs to controls only.
 
-// Help functionality
-const helpBtn = document.getElementById('helpBtn');
-if (helpBtn) {
-  helpBtn.addEventListener('click', () => {
-    notificationService.info(`
-      <strong>Compliance Frameworks Help</strong><br>
-      • Click on a framework to view its control items<br>
-      • Use the search bar to find specific frameworks<br>
-      • Filter by status to view frameworks in different stages<br>
-  • Click "New Custom Framework" to create a new framework
-    `, { duration: 10000 });
-  });
-}
-
 // Add refresh button functionality
 const refreshBtn = document.getElementById('refreshBtn');
 if (refreshBtn) {
   refreshBtn.addEventListener('click', async () => {
-    const loadingNotification = notificationService.loading('Refreshing frameworks...');
-    try {
-      await loadFrameworks();
-      notificationService.hide(loadingNotification);
-      notificationService.success('Frameworks refreshed');
-    } catch (error) {
-      notificationService.hide(loadingNotification);
-      notificationService.error(`Failed to refresh: ${error.message}`);
-    }
+    await loadFrameworks();
   });
 }
 
@@ -1195,60 +1191,41 @@ document.addEventListener('keydown', (e) => {
 // Error handling for uncaught errors
 window.addEventListener('error', (e) => {
   console.error('Uncaught error:', e.error);
-  notificationService.error('An unexpected error occurred. Please try again.');
 });
 
 window.addEventListener('unhandledrejection', (e) => {
   console.error('Unhandled promise rejection:', e.reason);
-  notificationService.error('An unexpected error occurred. Please try again.');
 });
 
 // Initialize the application
 async function initializeApp() {
-  try {
-    // Setup global handlers
-    setupPageSizeHandler();
+  // Setup global handlers
+  setupPageSizeHandler();
 
-    // Load initial frameworks
-    await loadFrameworks();
-    // If URL already points to a framework, open it
-    const initialId = getRouteFrameworkId();
-    if (initialId) {
-      openFramework(initialId);
-    } else {
-      // No framework selected on initial load - ensure correct empty state is shown
-      updatePageHeader(null);
-      const noDataState = document.getElementById('noDataState');
+  // Load initial frameworks
+  await loadFrameworks();
+  // If URL already points to a framework, open it
+  const initialId = getRouteFrameworkId();
+  if (initialId) {
+    openFramework(initialId);
+  } else {
+    // No framework selected on initial load - ensure correct empty state is shown
+    updatePageHeader(null);
+    const noDataState = document.getElementById('noDataState');
 
-      // Show the initial "select framework" state
-      if (tableHost) {
-        tableHost.style.display = 'block';
-        tableHost.classList.remove('hidden');
-      }
-      // Hide the "no data" state
-      if (noDataState) {
-        noDataState.style.display = 'none';
-        noDataState.classList.add('hidden');
-      }
-      // Hide table related elements
-      if (tableCardBody) tableCardBody.classList.add('hidden');
-      if (tableToolbar) tableToolbar.classList.add('hidden');
+    // Show the initial "select framework" state
+    if (tableHost) {
+      tableHost.style.display = 'block';
+      tableHost.classList.remove('hidden');
     }
-
-    // Show welcome message for first-time users
-    const hasVisited = UtilityService.getStorageWithExpiry('hasVisitedApp');
-    if (!hasVisited) {
-      setTimeout(() => {
-        notificationService.info(`
-          <strong>Welcome to Compliance Frameworks!</strong><br>
-          Select a framework from the list to view its control items, or create a new custom framework.
-        `, { duration: 8000 });
-        UtilityService.setStorageWithExpiry('hasVisitedApp', true, 30 * 24 * 60 * 60 * 1000); // 30 days
-      }, 1000);
+    // Hide the "no data" state
+    if (noDataState) {
+      noDataState.style.display = 'none';
+      noDataState.classList.add('hidden');
     }
-
-  } catch (error) {
-    notificationService.error(`Failed to initialize application: ${error.message}`);
+    // Hide table related elements
+    if (tableCardBody) tableCardBody.classList.add('hidden');
+    if (tableToolbar) tableToolbar.classList.add('hidden');
   }
 }
 
@@ -1258,8 +1235,28 @@ window.openNewFrameworkModal = function () {
   if (modal) {
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
+
+    // Reset form and data
     resetFrameworkForm();
-    notificationService.clearValidationErrors(document.getElementById('frameworkForm'));
+
+    // Clear validation errors
+    const form = document.getElementById('frameworkForm');
+    if (form) {
+    }
+
+    // Initialize stepper
+    const stepper = ensureStepperInstance();
+    if (stepper) {
+      stepper.reset(); // Go to step 1
+    }
+
+    // Focus first input
+    setTimeout(() => {
+      const firstInput = modal.querySelector('input[name="name"]');
+      if (firstInput) {
+        firstInput.focus();
+      }
+    }, 100);
   }
 };
 
@@ -1268,6 +1265,13 @@ window.closeNewFrameworkModal = function () {
   if (modal) {
     modal.style.display = 'none';
     document.body.style.overflow = '';
+
+    // Reset stepper and data
+    const stepper = getStepper(document.getElementById('frameworkStepper'));
+    if (stepper) {
+      stepper.reset();
+    }
+    resetFrameworkForm();
   }
 };
 

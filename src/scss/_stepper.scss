@@ -24,8 +24,42 @@
                 color: $color-text;
                 font-weight: 600;
                 font-size: 0.875rem;
+                transition: all 0.2s ease-in-out;
+                cursor: pointer;
 
                 &.active {
+                    background-color: $brand-500;
+                    color: white;
+                    transform: scale(1.05);
+                }
+
+                &.completed {
+                    background-color: $brand-500;
+                    color: white;
+
+                    &::after {
+                        content: "✓";
+                        font-size: 0.75rem;
+                    }
+                }
+
+                &.error {
+                    background-color: $danger-500;
+                    color: white;
+
+                    &::after {
+                        content: "✗";
+                        font-size: 0.75rem;
+                    }
+                }
+
+                &.disabled {
+                    background-color: $gray-200;
+                    color: $gray-400;
+                    cursor: not-allowed;
+                }
+
+                &:hover:not(.disabled) {
                     background-color: $brand-500;
                     color: white;
                 }
@@ -34,18 +68,59 @@
             .step-label {
                 font-weight: 500;
                 color: $color-text;
+                transition: color 0.2s ease-in-out;
+            }
+
+            &:has(.step-badge.active) .step-label {
+                color: $brand-500;
+                font-weight: 600;
+            }
+
+            &:has(.step-badge.completed) .step-label {
+                color: $brand-500;
+            }
+
+            &:has(.step-badge.error) .step-label {
+                color: $danger-500;
             }
         }
     }
 
     .step {
         display: none;
+        opacity: 0;
+        transform: translateX(10px);
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+
+        &.active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        &.completed {
+            .step-content {
+                opacity: 0.7;
+            }
+        }
+
+        &.error {
+            .step-content {
+                border-left: 3px solid $danger-500;
+                padding-left: 1rem;
+            }
+        }
     }
 
+    // Legacy support for data-step attribute
     &[data-step="1"] .step[data-index="1"],
     &[data-step="2"] .step[data-index="2"],
-    &[data-step="3"] .step[data-index="3"] {
+    &[data-step="3"] .step[data-index="3"],
+    &[data-step="4"] .step[data-index="4"],
+    &[data-step="5"] .step[data-index="5"] {
         display: block;
+        opacity: 1;
+        transform: translateX(0);
     }
 
     .step-actions {
@@ -63,15 +138,83 @@
             font-size: 0.875rem;
             transition: all 0.15s ease-in-out;
 
-            &:hover {
+            &:hover:not(:disabled) {
                 background-color: $gray-100;
                 border-color: $gray-400;
+            }
+
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
             }
 
             &.small {
                 font-size: 0.75rem;
                 padding: 0.25rem 0.5rem;
             }
+        }
+    }
+
+    // Navigation buttons
+    .stepper-nav {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid $gray-200;
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            &.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+        }
+    }
+
+    // Progress indicator
+    .stepper-progress {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+
+        .progress-line {
+            flex: 1;
+            height: 2px;
+            background-color: $gray-200;
+            margin: 0 1rem;
+            position: relative;
+
+            &::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                background-color: $brand-500;
+                transition: width 0.3s ease-in-out;
+            }
+        }
+
+        &[data-progress="25"] .progress-line::after {
+            width: 25%;
+        }
+
+        &[data-progress="50"] .progress-line::after {
+            width: 50%;
+        }
+
+        &[data-progress="75"] .progress-line::after {
+            width: 75%;
+        }
+
+        &[data-progress="100"] .progress-line::after {
+            width: 100%;
         }
     }
 }
