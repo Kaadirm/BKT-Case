@@ -488,9 +488,12 @@ function updatePageHeader(selectedName = null) {
     if (existing) existing.remove();
     if (selectedName) {
       const li = document.createElement('li');
-      li.className = 'crumb-item';
+      li.className = 'breadcrumb-item';
       li.setAttribute('aria-current', 'page');
-      li.textContent = selectedName;
+      const anchor = document.createElement('a');
+      anchor.href = window.location.pathname;
+      anchor.textContent = selectedName;
+      li.appendChild(anchor);
       breadcrumbOl.appendChild(li);
     }
   }
