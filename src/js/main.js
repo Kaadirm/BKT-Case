@@ -266,22 +266,7 @@ async function openFramework(id) {
         columns: [
           { key: 'controlId', label: 'Control ID', sortable: true },
           { key: 'controlCategory', label: 'Control Category', sortable: true },
-          { key: 'controlDescription', label: 'Control Description', sortable: false },
-          {
-            key: 'actions',
-            label: 'Actions',
-            sortable: false,
-            render: (value, row) => `
-              <div class="btn-group btn-group-sm">
-                <button class="btn btn-outline-primary" onclick="editControlItem('${UtilityService.sanitizeHtml(row.controlId)}')" title="Edit">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-outline-danger" onclick="deleteControlItem('${UtilityService.sanitizeHtml(row.controlId)}')" title="Delete">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
-            `
-          }
+          { key: 'controlDescription', label: 'Control Description', sortable: false }
         ],
         pageSize: parseInt(pageSizeSelect.value, 10)
       });
