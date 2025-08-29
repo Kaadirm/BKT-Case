@@ -45,15 +45,6 @@ $brand-gray-100: $gray-100;
 $brand-gray-600: $gray-600;
 $brand-green-500: $brand-500;
 
-// Optional Bootstrap overrides — uncomment if you want Bootstrap to adopt the brand palette
-// $body-bg: $color-bg-app;
-// $body-color: $color-text;
-// $border-color: $color-border;
-// $success: $brand-500;
-// $info: $info-500;
-// $warning: $warning-500;
-// $danger: $danger-500;
-
 // CSS variables export for runtime theming and plain CSS use
 :root {
     --app-bg: #{$color-bg-app};

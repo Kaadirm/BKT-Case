@@ -1,13 +1,13 @@
 # Compliance Frameworks UI (Demo)
 
-Pixel-conscious demo implementing your requirements using Bootstrap 5, SASS, Vanilla JS, and Fetch. No jQuery, no AJAX.
+Pixel-conscious demo implementing your requirements using SASS, Vanilla JS, and Fetch. No jQuery, no AJAX.
 
 ## What you get
 
 - Left list of frameworks; clicking loads a data table on the right by fetching from the backend service.
 - SimpleTable: small, dependency‑free search/sort/paginate table component.
 - Modal with a 2‑step generic Stepper. Step 1 validates before moving to Step 2.
-- SASS for styling; Bootstrap 5 base; responsive layout.
+- SASS for styling; responsive layout.
 
 ## Run locally
 

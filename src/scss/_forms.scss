@@ -1,0 +1,71 @@
+@use "colors" as *;
+
+// Form styles
+.custom-form {
+    .form-notice {
+        padding: 0.75rem;
+        background-color: #e3f2fd;
+        border: 1px solid #bbdefb;
+        border-radius: 0.25rem;
+        color: #1976d2;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
+        &.full-width {
+            .form-group {
+                flex: 1;
+            }
+        }
+
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+
+            .form-label {
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+                color: $color-text;
+            }
+
+            .form-input {
+                padding: 0.5rem 0.75rem;
+                border: 1px solid $gray-300;
+                border-radius: 0.25rem;
+                font-size: 1rem;
+                transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+                &:focus {
+                    outline: none;
+                    border-color: $brand-500;
+                    box-shadow: 0 0 0 0.2rem rgba($brand-500, 0.25);
+                }
+
+                &.invalid {
+                    border-color: #dc3545;
+                }
+
+                &[type="file"] {
+                    padding: 0.25rem;
+                }
+            }
+
+            .form-error {
+                margin-top: 0.25rem;
+                font-size: 0.875rem;
+                color: #dc3545;
+                display: none;
+
+                &.visible {
+                    display: block;
+                }
+            }
+        }
+    }
+}

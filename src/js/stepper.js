@@ -1,7 +1,7 @@
 export class Stepper {
   constructor(root, { onChange, onValidate } = {}) {
     this.root = root;
-    this.onChange = onChange || (() => {});
+    this.onChange = onChange || (() => { });
     this.onValidate = onValidate || this.defaultValidator.bind(this);
     this.current = parseInt(root.dataset.step || '1', 10);
   }
@@ -20,7 +20,15 @@ export class Stepper {
         if (form) {
           // Trigger native validation UI
           if (!form.checkValidity()) {
-            form.classList.add('was-validated');
+            // Add validation styling to invalid inputs
+            const invalidInputs = form.querySelectorAll(':invalid');
+            invalidInputs.forEach(input => {
+              input.classList.add('invalid');
+              const errorEl = input.parentElement.querySelector('.form-error');
+              if (errorEl) {
+                errorEl.classList.add('visible');
+              }
+            });
             return false;
           }
         }

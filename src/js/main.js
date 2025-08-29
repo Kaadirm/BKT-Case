@@ -759,9 +759,21 @@ function ensureStepperInstance() {
   if (stepperRoot && !modalStepper) {
     modalStepper = new Stepper(stepperRoot, {
       onChange: (from, to) => {
-        document.getElementById('saveFrameworkBtn').classList.toggle('d-none', to !== 2);
+        // Update step badges
+        const badges = stepperRoot.querySelectorAll('.step-badge');
+        badges.forEach((badge, index) => {
+          badge.classList.toggle('active', index + 1 === to);
+        });
+
+        // Update step indicator text
+        const stepIndicator = document.querySelector('.step-indicator');
+        if (stepIndicator) {
+          stepIndicator.textContent = `${to}/3`;
+        }
+
+        document.getElementById('saveFrameworkBtn').classList.toggle('hidden', to !== 2);
         const nextBtn = document.querySelector('[data-stepper-control="next"][data-stepper-target="#frameworkStepper"]');
-        if (nextBtn) nextBtn.classList.toggle('d-none', to === 2);
+        if (nextBtn) nextBtn.classList.toggle('hidden', to === 2);
 
         // Update step content based on current step
         updateStepContent(to);
@@ -1091,8 +1103,7 @@ if (saveBtn) {
       progressNotification.complete('Framework created successfully!');
 
       // Close modal
-      const modal = bootstrap.Modal.getInstance(document.querySelector('#frameworkModal'));
-      if (modal) modal.hide();
+      closeNewFrameworkModal();
 
       // Reset form
       resetFrameworkForm();
@@ -1118,7 +1129,7 @@ function resetFrameworkForm() {
 
   // Reset stepper to first step
   if (modalStepper) {
-    modalStepper.goTo(0);
+    modalStepper.go(1);
   }
 }
 
@@ -1170,25 +1181,12 @@ document.addEventListener('keydown', (e) => {
   // Ctrl/Cmd + N for new framework
   if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
     e.preventDefault();
-    const newFrameworkBtn = document.querySelector('[data-bs-target="#frameworkModal"]');
-    if (newFrameworkBtn) newFrameworkBtn.click();
+    openNewFrameworkModal();
   }
 
   // Escape to close modals
   if (e.key === 'Escape') {
-    const openModals = document.querySelectorAll('.modal.show');
-    openModals.forEach(modal => {
-      const modalInstance = bootstrap.Modal.getInstance(modal);
-      if (modalInstance) modalInstance.hide();
-    });
-  }
-});
-
-// Handle modal events
-document.addEventListener('show.bs.modal', (e) => {
-  if (e.target.id === 'frameworkModal') {
-    resetFrameworkForm();
-    notificationService.clearValidationErrors(document.getElementById('frameworkForm'));
+    closeNewFrameworkModal();
   }
 });
 
@@ -1253,6 +1251,25 @@ async function initializeApp() {
     notificationService.error(`Failed to initialize application: ${error.message}`);
   }
 }
+
+// Custom modal functions
+window.openNewFrameworkModal = function () {
+  const modal = document.getElementById('newFrameworkModal');
+  if (modal) {
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    resetFrameworkForm();
+    notificationService.clearValidationErrors(document.getElementById('frameworkForm'));
+  }
+};
+
+window.closeNewFrameworkModal = function () {
+  const modal = document.getElementById('newFrameworkModal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+};
 
 // Start the application
 initializeApp();

@@ -13,8 +13,6 @@
     rel="stylesheet">
   <!-- Compiled SASS output -->
   <link href="/dist/css/styles.css" rel="stylesheet" />
-  <!-- Bootstrap Icons for a few UI glyphs -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
@@ -32,7 +30,7 @@
         <!-- Left: Icon + Title + Breadcrumb -->
         <div class="header-info">
           <div class="icon">
-            <span class=" text-success d-inline-flex align-items-center justify-content-center">
+            <span class="text-success icon-wrapper">
               <svg width="44" height="48" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true" focusable="false">
                 <path
@@ -44,9 +42,9 @@
           <div class="info-header">
             <h2 class="info-title">Compliance Frameworks</h2>
             <nav class="breadcrumb" aria-label="breadcrumb">
-              <ol class="breadcrumb small mb-0 text-secondary" style="--bs-breadcrumb-divider: '›';">
-                <li class="breadcrumb-item"><a href="#" class="text-secondary text-decoration-none">Admin</a></li>
-                <li class="breadcrumb-item"><a href="#" class="text-secondary text-decoration-none">Compliance
+              <ol class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Admin</a></li>
+                <li class="breadcrumb-item"><a href="#" class="breadcrumb-link">Compliance
                     Frameworks</a></li>
               </ol>
             </nav>
@@ -69,7 +67,7 @@
               </defs>
             </svg>
             <span>Help</span></button>
-          <button type="button" class="new-framework-button">
+          <button type="button" class="new-framework-button" onclick="openNewFrameworkModal()">
             <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M11 7.21417H6.71417V11.5H5.28583V7.21417H1V5.78583H5.28583V1.5H6.71417V5.78583H11V7.21417Z"
                 fill="white" />
@@ -143,7 +141,7 @@
             <div class="empty-list-content">
               <div class="empty-list-icon"></div>
               <p class="empty-list-text">Please select framework from list on the left side or <a href="#"
-                  data-bs-toggle="modal" data-bs-target="#newFrameworkModal">click here</a> to add new framework</p>
+                  onclick="openNewFrameworkModal()">click here</a> to add new framework</p>
             </div>
           </div>
 
@@ -152,7 +150,7 @@
             <div class="empty-list-content">
               <div class="empty-list-icon"></div>
               <p class="empty-list-text">No control items found for this framework. <button type="button"
-                  class="btn btn-link p-0" onclick="addNewControlItem()">Add new control item</button> to get started.
+                  class="btn-link" onclick="addNewControlItem()">Add new control item</button> to get started.
               </p>
             </div>
           </div>
@@ -162,75 +160,81 @@
   </main>
 
   <!-- Footer Section -->
-  <footer class="app-footer bg-white border-top">
+  <footer class="app-footer">
     <div>
       <!-- Footer content can be added here if needed -->
     </div>
   </footer>
 
   <!-- New Custom Framework Modal -->
-  <div class="modal fade" id="newFrameworkModal" tabindex="-1" aria-labelledby="newFrameworkModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title fs-5" id="newFrameworkModalLabel">Add New Framework <span
-              class="text-secondary small ms-1">1/3</span></h2>
-          <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="custom-modal" id="newFrameworkModal" style="display: none;">
+    <div class="custom-modal-backdrop" onclick="closeNewFrameworkModal()"></div>
+    <div class="custom-modal-dialog">
+      <div class="custom-modal-content">
+        <div class="custom-modal-header">
+          <h2 class="custom-modal-title" id="newFrameworkModalLabel">Add New Framework <span
+              class="step-indicator">1/3</span></h2>
+          <button type="button" class="custom-modal-close" onclick="closeNewFrameworkModal()"
+            aria-label="Close">&times;</button>
         </div>
-        <div class="modal-body">
+        <div class="custom-modal-body">
           <div id="frameworkStepper" class="stepper" data-step="1">
             <!-- Stepper header -->
-            <div class="stepper-head d-flex align-items-center justify-content-between mb-3">
-              <div class="d-flex align-items-center gap-2">
-                <div class="step-badge" aria-hidden="true">01</div>
-                <div class="fw-medium">Framework Details</div>
+            <div class="stepper-head">
+              <div class="step-indicator-wrapper">
+                <div class="step-badge active" aria-hidden="true">01</div>
+                <div class="step-label">Framework Details</div>
               </div>
-              <div class="d-flex align-items-center gap-2">
-                <div class="fw-medium">Control Items</div>
+              <div class="step-indicator-wrapper">
+                <div class="step-label">Control Items</div>
                 <div class="step-badge" aria-hidden="true">02</div>
               </div>
             </div>
 
             <!-- Steps -->
             <div class="step" data-index="1" data-validate="#frameworkForm">
-              <form id="frameworkForm" class="needs-validation" novalidate>
-                <div class="alert alert-info py-2 small">You can 1 Enterprise Framework license available.</div>
-                <div class="row g-3">
-                  <div class="col-md-6">
+              <form id="frameworkForm" class="custom-form" novalidate>
+                <div class="form-notice">You can 1 Enterprise Framework license available.</div>
+                <div class="form-row">
+                  <div class="form-group">
                     <label class="form-label">Name</label>
-                    <input class="form-control" name="name" required placeholder="Enter name" />
-                    <div class="invalid-feedback">Name is required.</div>
+                    <input class="form-input" name="name" required placeholder="Enter name" />
+                    <div class="form-error">Name is required.</div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="form-group">
                     <label class="form-label">Short Name</label>
-                    <input class="form-control" name="shortName" required placeholder="Enter short name" />
-                    <div class="invalid-feedback">Short name is required.</div>
+                    <input class="form-input" name="shortName" required placeholder="Enter short name" />
+                    <div class="form-error">Short name is required.</div>
                   </div>
-                  <div class="col-md-12">
+                </div>
+                <div class="form-row">
+                  <div class="form-group full-width">
                     <label class="form-label">Upload Framework Logo</label>
-                    <input type="file" class="form-control" />
+                    <input type="file" class="form-input" />
                   </div>
-                  <div class="col-md-12">
+                </div>
+                <div class="form-row">
+                  <div class="form-group full-width">
                     <label class="form-label">Description</label>
-                    <textarea class="form-control" rows="3" placeholder="Please add description"></textarea>
+                    <textarea class="form-input" rows="3" placeholder="Please add description"></textarea>
                   </div>
-                  <div class="col-md-12">
+                </div>
+                <div class="form-row">
+                  <div class="form-group full-width">
                     <label class="form-label">Upload Template</label>
-                    <input type="file" class="form-control" />
+                    <input type="file" class="form-input" />
                   </div>
                 </div>
               </form>
             </div>
 
             <div class="step" data-index="2">
-              <div class="d-flex justify-content-end mb-2">
-                <button class="btn btn-sm btn-outline-secondary me-2" data-action="addMockItems"><i
-                    class="bi bi-plus-lg me-1"></i>Add Control Items</button>
+              <div class="step-actions">
+                <button class="btn-secondary small" data-action="addMockItems">Add Control Items</button>
               </div>
-              <div class="table-responsive border rounded">
-                <table class="table table-sm align-middle mb-0" id="newFwItemsTable">
-                  <thead class="table-light">
+              <div class="custom-table-container">
+                <table class="custom-table" id="newFwItemsTable">
+                  <thead>
                     <tr>
                       <th style="width: 160px;">Control ID</th>
                       <th style="width: 240px;">Control Category</th>
@@ -244,17 +248,17 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <div class="d-flex w-100 justify-content-between">
+        <div class="custom-modal-footer">
+          <div class="modal-footer-content">
             <div>
-              <button class="btn btn-secondary" data-stepper-control="prev"
-                data-stepper-target="#frameworkStepper">Previous Step</button>
+              <button class="btn-secondary" data-stepper-control="prev" data-stepper-target="#frameworkStepper">Previous
+                Step</button>
             </div>
-            <div class="d-flex gap-2">
-              <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button class="btn btn-success" data-stepper-control="next" data-stepper-target="#frameworkStepper">Next ›
+            <div class="modal-footer-actions">
+              <button class="btn-outline-secondary" onclick="closeNewFrameworkModal()">Cancel</button>
+              <button class="btn-success" data-stepper-control="next" data-stepper-target="#frameworkStepper">Next ›
                 Control Items</button>
-              <button class="btn btn-primary d-none" id="saveFrameworkBtn">Save</button>
+              <button class="btn-primary hidden" id="saveFrameworkBtn">Save</button>
             </div>
           </div>
         </div>
@@ -262,9 +266,6 @@
     </div>
   </div>
 
-  <!-- Bootstrap JS (for modal) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    crossorigin="anonymous"></script>
   <!-- Our app scripts -->
   <script type="module" src="/src/js/main.js"></script>
 </body>

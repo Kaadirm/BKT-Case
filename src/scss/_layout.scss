@@ -1,0 +1,180 @@
+@use "colors" as *;
+
+// Layout and Header styles
+.app-header,
+.app-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    min-height: 56px;
+    background: $color-surface;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05);
+}
+
+.app-header {
+    top: 0;
+}
+
+.app-footer {
+    bottom: 0;
+}
+
+.page-main {
+    font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+
+    .page-header {
+        padding: 32px 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+        .header-frame {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+
+            .header-info {
+                display: flex;
+                align-items: center;
+                gap: 24px;
+                padding-left: 16px;
+
+                .icon {
+                    background-color: $color-surface;
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 999px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    span {
+                        width: 48px;
+                        height: 48px;
+                    }
+                }
+
+                .info-header {
+                    padding: 16px 0;
+
+                    .info-title {
+                        font-size: 26px;
+                        font-weight: 600;
+                        color: $gray-900;
+                        margin: 0 0 4px 0;
+                    }
+
+                    .breadcrumb {
+
+                        &,
+                        ol {
+                            list-style: none;
+                            padding: 0;
+                            margin: 0;
+                            display: flex;
+                            flex-wrap: wrap;
+                            align-items: center;
+                        }
+
+                        .breadcrumb-item {
+                            display: inline-flex;
+                            align-items: center;
+                            font-size: 12px;
+
+                            &::before {
+                                content: '›';
+                                color: $gray-400;
+                                margin: 0 4px;
+                                font-size: 16px;
+                                line-height: 18px;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+
+                            &:first-child::before {
+                                display: none;
+                            }
+                        }
+
+                        .breadcrumb-item {
+                            a {
+                                color: $gray-800;
+                                text-decoration: none;
+                                font-size: 12px;
+
+                                &:hover {
+                                    color: $gray-800;
+                                }
+                            }
+
+                            &:first-child {
+                                a {
+                                    cursor: default;
+                                }
+                            }
+
+                            &:last-child {
+                                a {
+                                    color: $gray-600;
+                                    font-weight: 400;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            .header-actions {
+                display: flex;
+                gap: 4px;
+                align-items: center;
+
+                .help-button {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 6px 12px;
+                    gap: 4px;
+                    width: 72px;
+                    height: 33px;
+                    background: $gray-600;
+                    border-radius: 8px;
+                    flex-grow: 0;
+                    border: none;
+                    color: $white;
+                    font-weight: 500;
+                    font-size: 14px;
+                    cursor: pointer;
+                }
+
+                .new-framework-button {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 6px 12px;
+                    gap: 4px;
+                    max-width: 246px;
+                    height: 33px;
+                    background: $brand-500;
+                    border-radius: 8px;
+                    border: none;
+                    cursor: pointer;
+                    color: $white;
+                    font-weight: 500;
+                    font-size: 14px;
+
+                    .count-badge {
+                        padding: 0px 4px;
+                        background: $white;
+                        border-radius: 4px;
+                        font-weight: 500;
+                        font-size: 14px;
+                        line-height: 21px;
+                        color: $brand-500;
+                    }
+                }
+            }
+        }
+    }
+}
