@@ -245,8 +245,10 @@ async function openFramework(id) {
     const displayName = itemEl?.querySelector('.item-title')?.textContent?.trim() || id;
     updatePageHeader(displayName);
 
-    // Show loading state
-    tableHost.innerHTML = '<div class="py-5 text-center text-secondary"><div class="spinner-border" role="status" aria-label="Loading"></div><div class="mt-2">Loading data...</div></div>';
+    // Show loading state only if table is not already present
+    if (!table || !tableHost.contains(table.wrapper)) {
+      tableHost.innerHTML = '<div class="py-5 text-center text-secondary"><div class="spinner-border" role="status" aria-label="Loading"></div><div class="mt-2">Loading data...</div></div>';
+    }
 
     // Create abort controller for this request
     currentLoadingController = new AbortController();
@@ -260,8 +262,8 @@ async function openFramework(id) {
       return;
     }
 
-    // Build table if needed
-    if (!table) {
+    // Build table if needed or if previous DOM was replaced
+    if (!table || !tableHost.contains(table.wrapper)) {
       table = new SimpleTable(tableHost, {
         columns: [
           { key: 'controlId', label: 'Control ID', sortable: true },

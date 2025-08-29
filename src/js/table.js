@@ -115,7 +115,7 @@ export class SimpleTable {
       const tr = document.createElement('tr');
       for (const col of this.columns) {
         const td = document.createElement('td');
-        
+
         if (col.render && typeof col.render === 'function') {
           // Use custom render function for this column
           td.innerHTML = col.render(row[col.key], row);
@@ -123,7 +123,7 @@ export class SimpleTable {
           // Default text rendering
           td.textContent = row[col.key] ?? '';
         }
-        
+
         tr.appendChild(td);
       }
       this.tbody.appendChild(tr);
@@ -136,7 +136,7 @@ export class SimpleTable {
     // Pagination controls
     const pages = Math.max(1, Math.ceil(total / this.pageSize));
     this.pag.innerHTML = '';
-    
+
     if (pages > 1) {
       const makeBtn = (label, disabled, page) => {
         const btn = document.createElement('button');
@@ -150,14 +150,14 @@ export class SimpleTable {
         btn.addEventListener('click', () => { this.currentPage = page; this._render(); });
         return btn;
       };
-      
+
       this.pag.appendChild(makeBtn('Previous', this.currentPage === 1, Math.max(1, this.currentPage - 1)));
-      
+
       // Simple pager: show up to 5 pages centered
       const range = 2;
       const startPage = Math.max(1, this.currentPage - range);
       const endPage = Math.min(pages, this.currentPage + range);
-      
+
       // Show first page if not in range
       if (startPage > 1) {
         this.pag.appendChild(makeBtn('1', false, 1));
@@ -168,7 +168,7 @@ export class SimpleTable {
           this.pag.appendChild(ellipsis);
         }
       }
-      
+
       for (let p = startPage; p <= endPage; p++) {
         const b = makeBtn(String(p), false, p);
         if (p === this.currentPage) {
@@ -177,7 +177,7 @@ export class SimpleTable {
         }
         this.pag.appendChild(b);
       }
-      
+
       // Show last page if not in range
       if (endPage < pages) {
         if (endPage < pages - 1) {
@@ -188,7 +188,7 @@ export class SimpleTable {
         }
         this.pag.appendChild(makeBtn(String(pages), false, pages));
       }
-      
+
       this.pag.appendChild(makeBtn('Next', this.currentPage === pages, Math.min(pages, this.currentPage + 1)));
     }
   }
