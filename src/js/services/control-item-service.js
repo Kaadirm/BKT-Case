@@ -136,15 +136,15 @@ export class ControlItemService {
    */
   validateControlItem(controlItem) {
     const errors = [];
-    
+
     if (!controlItem.controlId?.trim()) {
       errors.push('Control ID is required');
     }
-    
+
     if (!controlItem.controlCategory?.trim()) {
       errors.push('Control Category is required');
     }
-    
+
     if (!controlItem.controlDescription?.trim()) {
       errors.push('Control Description is required');
     }
@@ -158,92 +158,5 @@ export class ControlItemService {
     return errors;
   }
 
-  /**
-   * Import control items from CSV/Excel data
-   */
-  async importControlItems(frameworkId, data, mapping = {}) {
-    const {
-      controlIdColumn = 'controlId',
-      controlCategoryColumn = 'controlCategory',
-      controlDescriptionColumn = 'controlDescription'
-    } = mapping;
 
-    const controlItems = data.map(row => ({
-      controlId: row[controlIdColumn],
-      controlCategory: row[controlCategoryColumn],
-      controlDescription: row[controlDescriptionColumn]
-    }));
-
-    // Validate all items first
-    const validationErrors = [];
-    controlItems.forEach((item, index) => {
-      const errors = this.validateControlItem(item);
-      if (errors.length > 0) {
-        validationErrors.push({ row: index + 1, errors });
-      }
-    });
-
-    if (validationErrors.length > 0) {
-      throw new Error(`Validation errors found: ${JSON.stringify(validationErrors)}`);
-    }
-
-    // Bulk add if validation passes
-    return await this.bulkAddControlItems(frameworkId, controlItems);
-  }
-
-  /**
-   * Export control items to structured data
-   */
-  async exportControlItems(frameworkId, format = 'json') {
-    try {
-      const controls = await this.api.getFrameworkRows(frameworkId);
-      
-      switch (format.toLowerCase()) {
-        case 'csv':
-          return this._convertToCSV(controls);
-        case 'excel':
-          return this._convertToExcel(controls);
-        default:
-          return controls;
-      }
-    } catch (error) {
-      throw new Error(`Failed to export control items: ${error.message}`);
-    }
-  }
-
-  /**
-   * Convert control items to CSV format
-   */
-  _convertToCSV(controls) {
-    const headers = ['Control ID', 'Control Category', 'Control Description'];
-    const rows = controls.map(control => [
-      control.controlId || '',
-      control.controlCategory || '',
-      control.controlDescription || ''
-    ]);
-
-    const csvContent = [headers, ...rows]
-      .map(row => row.map(field => `"${field.replace(/"/g, '""')}"`).join(','))
-      .join('\n');
-
-    return csvContent;
-  }
-
-  /**
-   * Convert control items to Excel-like format (tab-separated)
-   */
-  _convertToExcel(controls) {
-    const headers = ['Control ID', 'Control Category', 'Control Description'];
-    const rows = controls.map(control => [
-      control.controlId || '',
-      control.controlCategory || '',
-      control.controlDescription || ''
-    ]);
-
-    const excelContent = [headers, ...rows]
-      .map(row => row.join('\t'))
-      .join('\n');
-
-    return excelContent;
-  }
 }

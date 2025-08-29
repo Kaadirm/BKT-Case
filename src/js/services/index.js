@@ -10,12 +10,10 @@ export { UtilityService } from './utility-service.js';
 export class ServiceFactory {
   constructor(config = {}) {
     this.config = {
-      mode: 'service',
       serviceBase: 'https://bk-backend.vercel.app/api/v1',
-      jsonBase: './public/api',
       ...config
     };
-    
+
     this._api = null;
     this._frameworkService = null;
     this._controlItemService = null;
@@ -25,7 +23,8 @@ export class ServiceFactory {
 
   get api() {
     if (!this._api) {
-      this._api = new Api(this.config);
+      const { serviceBase } = this.config;
+      this._api = new Api({ serviceBase });
     }
     return this._api;
   }

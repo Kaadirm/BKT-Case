@@ -8,9 +8,9 @@
     "sass:build": "sass --quiet-deps --load-path=node_modules src/scss:dist/css --no-source-map --style=compressed",
     "serve": "http-server -c-1 -p 5173 .",
     "proxy": "node dev-proxy.js",
-    "dev": "concurrently -k \"npm:proxy\" \"npm:serve\" \"npm:sass:watch\"",
+    "dev": "concurrently -k \"npm:proxy\" \"npm:sass:watch\"",
     "build": "npm run sass:build",
-    "start": "npm run serve"
+    "start": "node dev-proxy.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

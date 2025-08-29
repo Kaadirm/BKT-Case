@@ -8,7 +8,7 @@ import { NotificationService } from './services/notification-service.js';
 import { UtilityService } from './services/utility-service.js';
 
 // Initialize services
-const api = new Api({ mode: 'service', serviceBase: 'https://bk-backend.vercel.app/api/v1', jsonBase: './public/api' });
+const api = new Api({ serviceBase: 'https://bk-backend.vercel.app/api/v1' });
 const frameworkService = new FrameworkService(api);
 const controlItemService = new ControlItemService(api);
 const fileUploadService = new FileUploadService();
@@ -33,7 +33,7 @@ function renderFrameworkItem(item) {
   const shortName = item.shortName ?? name;
   const description = item.description ?? item.subtitle ?? '';
   const status = item.status ?? '';
-  
+
   // Map status to display text and CSS class
   const statusMapping = {
     'published': { text: 'Published', class: 'status-published', icon: '✓' },
@@ -44,38 +44,38 @@ function renderFrameworkItem(item) {
     'deactivated': { text: 'Deactivated', class: 'status-deactivated', icon: '⊘' },
     'draft': { text: 'Draft', class: 'status-draft', icon: '◐' }
   };
-  
+
   const statusInfo = statusMapping[status] || { text: status, class: 'status-default', icon: '◐' };
   const icon = item.icon || 'icon-grid';
-  
+
   // Create the anchor element
   const anchor = document.createElement('a');
   anchor.className = 'framework-item';
   anchor.dataset.id = id;
   anchor.href = `/framework/${encodeURIComponent(id)}`;
   anchor.setAttribute('aria-label', `Open ${name}`);
-  
+
   // Create main container
   const mainDiv = document.createElement('div');
   mainDiv.className = 'item-container';
-  
+
   // Create avatar
   const avatarDiv = document.createElement('div');
   avatarDiv.className = 'avatar';
   const iconElement = document.createElement('i');
   iconElement.className = `icon ${icon}`;
   avatarDiv.appendChild(iconElement);
-  
+
   // Create content container
   const contentDiv = document.createElement('div');
   contentDiv.className = 'item-content';
-  
+
   // Create category label (this will show "Custom Framework" or "System Framework")
   const categoryDiv = document.createElement('div');
   categoryDiv.className = 'item-category';
   categoryDiv.textContent = item.isEnterprise ? 'Enterprise Framework' : 'Custom Framework';
   contentDiv.appendChild(categoryDiv);
-  
+
   // Create header row
   const headerDiv = document.createElement('div');
   headerDiv.className = 'item-header';
@@ -85,68 +85,68 @@ function renderFrameworkItem(item) {
   nameDiv.className = 'item-title';
   nameDiv.textContent = shortName;
   headerDiv.appendChild(nameDiv);
-  
+
   // Create subtitle (description)
   const subtitleDiv = document.createElement('div');
   subtitleDiv.className = 'item-subtitle';
   subtitleDiv.textContent = description;
   // Place subtitle within the same header container as title
   headerDiv.appendChild(subtitleDiv);
-  
+
   // Create status chip if status exists
   if (status) {
     const statusDiv = document.createElement('div');
     statusDiv.className = `item-status ${statusInfo.class}`;
-    
+
     // Create status icon
     const statusIconDiv = document.createElement('div');
     statusIconDiv.className = 'status-icon';
     statusDiv.appendChild(statusIconDiv);
-    
+
     // Create status text
     const statusTextDiv = document.createElement('div');
     statusTextDiv.className = 'status-text';
     statusTextDiv.textContent = statusInfo.text;
     statusDiv.appendChild(statusTextDiv);
-    
+
     anchor.appendChild(statusDiv);
   }
-  
+
   // Assemble the structure
   contentDiv.appendChild(headerDiv);
   mainDiv.appendChild(avatarDiv);
   mainDiv.appendChild(contentDiv);
   anchor.appendChild(mainDiv);
   li.appendChild(anchor);
-  
+
   return li;
 }
 
 function renderSkeletonItem() {
   const li = document.createElement('li');
-  
+
   // Create the anchor element with skeleton class
   const anchor = document.createElement('a');
   anchor.className = 'framework-item skeleton';
-  
+
   // Create main container
   const mainDiv = document.createElement('div');
   mainDiv.className = 'item-container';
-  
+
   // Create skeleton avatar
   const avatarDiv = document.createElement('div');
   avatarDiv.className = 'avatar';
-  
+
   // Create skeleton content container
   const contentDiv = document.createElement('div');
   contentDiv.className = 'item-content';
-  
+
   // Create skeleton category label
   const categoryDiv = document.createElement('div');
   categoryDiv.className = 'item-category';
   categoryDiv.textContent = 'Loading...';
   contentDiv.appendChild(categoryDiv);
-  
+
   // Create skeleton header row
   const headerDiv = document.createElement('div');
   headerDiv.className = 'item-header';
@@ -156,26 +156,26 @@ function renderSkeletonItem() {
   nameDiv.className = 'item-title';
   nameDiv.textContent = 'Loading Framework';
   headerDiv.appendChild(nameDiv);
-  
+
   // Create skeleton subtitle
   const subtitleDiv = document.createElement('div');
   subtitleDiv.className = 'item-subtitle';
   subtitleDiv.textContent = 'Loading description...';
   headerDiv.appendChild(subtitleDiv);
-  
+
   // Create skeleton status chip
   const statusDiv = document.createElement('div');
   statusDiv.className = 'item-status';
-  
+
   const statusIconDiv = document.createElement('div');
   statusIconDiv.className = 'status-icon';
   statusDiv.appendChild(statusIconDiv);
-  
+
   const statusTextDiv = document.createElement('div');
   statusTextDiv.className = 'status-text';
   statusTextDiv.textContent = 'Loading';
   statusDiv.appendChild(statusTextDiv);
-  
+
   // Assemble the structure
   contentDiv.appendChild(headerDiv);
   mainDiv.appendChild(avatarDiv);
@@ -183,7 +183,7 @@ function renderSkeletonItem() {
   anchor.appendChild(mainDiv);
   anchor.appendChild(statusDiv);
   li.appendChild(anchor);
-  
+
   return li;
 }
 
@@ -198,16 +198,16 @@ async function loadFrameworks(options = {}) {
   try {
     // Show skeleton loading state
     showSkeletonLoading(8);
-    
+
     const items = await frameworkService.getFrameworks(options);
-    
+
     // Clear skeleton items
     listEl.innerHTML = '';
-    
+
     for (const item of items) {
       listEl.appendChild(renderFrameworkItem(item));
     }
-    
+
     if (items.length === 0) {
       listEl.innerHTML = '<li class="text-center text-muted p-3">No frameworks found</li>';
     }
@@ -232,15 +232,19 @@ async function openFramework(id) {
     currentFrameworkId = id;
     activateItem(id);
     tableToolbar.classList.remove('hidden');
+    // Update page title + breadcrumb using visible item title (short name)
+    const itemEl = listEl.querySelector(`.framework-item[data-id="${id}"]`);
+    const displayName = itemEl?.querySelector('.item-title')?.textContent?.trim() || id;
+    updatePageHeader(displayName);
 
     // Show loading state
     tableHost.innerHTML = '<div class="py-5 text-center text-secondary"><div class="spinner-border" role="status" aria-label="Loading"></div><div class="mt-2">Loading data...</div></div>';
 
     // Create abort controller for this request
     currentLoadingController = new AbortController();
-    
-    const rows = await controlItemService.getControlItems(id, { 
-      signal: currentLoadingController.signal 
+
+    const rows = await controlItemService.getControlItems(id, {
+      signal: currentLoadingController.signal
     });
 
     // Check if this request was aborted
@@ -255,9 +259,9 @@ async function openFramework(id) {
           { key: 'controlId', label: 'Control ID', sortable: true },
           { key: 'controlCategory', label: 'Control Category', sortable: true },
           { key: 'controlDescription', label: 'Control Description', sortable: false },
-          { 
-            key: 'actions', 
-            label: 'Actions', 
+          {
+            key: 'actions',
+            label: 'Actions',
             sortable: false,
             render: (value, row) => `
               <div class="btn-group btn-group-sm">
@@ -281,18 +285,11 @@ async function openFramework(id) {
     }
 
     table.load(rows);
-    
-    // Update table header with framework info (non-blocking)
-    try {
-      const frameworkDetails = await frameworkService.getFrameworkDetails(id);
-      updateTableHeader(frameworkDetails);
-    } catch (error) {
-      console.warn('Failed to load framework details:', error);
-    }
-    
+    // No additional fetch here; avoid calling /frameworks/:id on click
+
     // Clear the loading controller since we're done
     currentLoadingController = null;
-    
+
   } catch (err) {
     if (err && err.name === 'AbortError') return; // ignore aborted request
     notificationService.error(`Failed to load framework data: ${err.message}`);
@@ -309,10 +306,33 @@ function getRouteFrameworkId() {
 }
 
 function navigateToFramework(id, { replace = false } = {}) {
+  // Avoid reloading the same framework
+  if (currentFrameworkId === id) return;
   const url = `/framework/${encodeURIComponent(id)}`;
   const method = replace ? 'replaceState' : 'pushState';
   window.history[method]({ frameworkId: id }, '', url);
   openFramework(id);
+}
+
+// Keep page header and breadcrumb in sync with current selection
+function updatePageHeader(selectedName = null) {
+  const titleEl = document.querySelector('.info-title');
+  if (titleEl) {
+    titleEl.textContent = selectedName ? `Compliance Frameworks: ${selectedName}` : 'Compliance Frameworks';
+  }
+
+  const breadcrumbOl = document.querySelector('.info-header nav.breadcrumb ol.breadcrumb');
+  if (breadcrumbOl) {
+    const existing = breadcrumbOl.querySelector('li[aria-current="page"]');
+    if (existing) existing.remove();
+    if (selectedName) {
+      const li = document.createElement('li');
+      li.className = 'breadcrumb-item';
+      li.setAttribute('aria-current', 'page');
+      li.textContent = selectedName;
+      breadcrumbOl.appendChild(li);
+    }
+  }
 }
 
 function updateTableHeader(framework) {
@@ -325,9 +345,6 @@ function updateTableHeader(framework) {
           <p class="text-muted mb-0">${framework.controlCount || 0} control items</p>
         </div>
         <div class="btn-group">
-          <button class="btn btn-outline-primary btn-sm" onclick="exportFrameworkData()">
-            <i class="bi bi-download"></i> Export
-          </button>
           <button class="btn btn-outline-success btn-sm" onclick="addNewControlItem()">
             <i class="bi bi-plus"></i> Add Control
           </button>
@@ -359,22 +376,27 @@ listEl.addEventListener('keydown', (e) => {
 
 window.addEventListener('popstate', () => {
   const id = getRouteFrameworkId();
-  if (id) openFramework(id);
+  if (id) {
+    openFramework(id);
+  } else {
+    currentFrameworkId = null;
+    updatePageHeader(null);
+  }
 });
 
 // Control item management functions
-window.editControlItem = async function(controlId) {
+window.editControlItem = async function (controlId) {
   if (!currentFrameworkId) return;
-  
+
   try {
     const controls = await controlItemService.getControlItems(currentFrameworkId);
     const control = controls.find(c => c.controlId === controlId);
-    
+
     if (!control) {
       notificationService.error('Control item not found');
       return;
     }
-    
+
     // Show edit modal or inline editing
     showControlItemEditModal(control);
   } catch (error) {
@@ -382,22 +404,22 @@ window.editControlItem = async function(controlId) {
   }
 };
 
-window.deleteControlItem = async function(controlId) {
+window.deleteControlItem = async function (controlId) {
   if (!currentFrameworkId) return;
-  
+
   const confirmed = await notificationService.confirm(
     `Are you sure you want to delete control item "${controlId}"?`,
     { title: 'Delete Control Item', confirmLabel: 'Delete', type: 'danger' }
   );
-  
+
   if (!confirmed) return;
-  
+
   try {
     const loadingNotification = notificationService.loading('Deleting control item...');
     await controlItemService.deleteControlItem(currentFrameworkId, controlId);
     notificationService.hide(loadingNotification);
     notificationService.success('Control item deleted successfully');
-    
+
     // Refresh table
     await openFramework(currentFrameworkId);
   } catch (error) {
@@ -405,29 +427,15 @@ window.deleteControlItem = async function(controlId) {
   }
 };
 
-window.addNewControlItem = function() {
+window.addNewControlItem = function () {
   showControlItemEditModal();
 };
 
-window.exportFrameworkData = async function() {
-  if (!currentFrameworkId) return;
-  
-  try {
-    const csvData = await controlItemService.exportControlItems(currentFrameworkId, 'csv');
-    const framework = await frameworkService.getFrameworkDetails(currentFrameworkId);
-    const filename = `${UtilityService.slugify(framework.name)}-controls.csv`;
-    
-    fileUploadService.downloadFile(csvData, filename, 'text/csv');
-    notificationService.success('Framework data exported successfully');
-  } catch (error) {
-    notificationService.error(`Failed to export data: ${error.message}`);
-  }
-};
 
 function showControlItemEditModal(control = null) {
   const isEdit = !!control;
   const modalTitle = isEdit ? 'Edit Control Item' : 'Add New Control Item';
-  
+
   // Create modal HTML
   const modalHtml = `
     <div class="modal fade" id="controlItemModal" tabindex="-1" aria-labelledby="controlItemModalLabel" aria-hidden="true">
@@ -464,31 +472,31 @@ function showControlItemEditModal(control = null) {
       </div>
     </div>
   `;
-  
+
   // Remove existing modal if any
   const existingModal = document.getElementById('controlItemModal');
   if (existingModal) {
     existingModal.remove();
   }
-  
+
   // Add modal to DOM
   document.body.insertAdjacentHTML('beforeend', modalHtml);
-  
+
   // Initialize modal
   const modal = new bootstrap.Modal(document.getElementById('controlItemModal'));
-  
+
   // Load categories for datalist
   loadControlCategories();
-  
+
   // Setup save handler
   document.getElementById('saveControlItemBtn').addEventListener('click', async () => {
     await saveControlItem(isEdit, control?.controlId);
     modal.hide();
   });
-  
+
   // Show modal
   modal.show();
-  
+
   // Clean up on hide
   document.getElementById('controlItemModal').addEventListener('hidden.bs.modal', () => {
     document.getElementById('controlItemModal').remove();
@@ -497,11 +505,11 @@ function showControlItemEditModal(control = null) {
 
 async function loadControlCategories() {
   if (!currentFrameworkId) return;
-  
+
   try {
     const categories = await controlItemService.getControlCategories(currentFrameworkId);
     const datalist = document.getElementById('categoryDatalist');
-    
+
     if (datalist) {
       datalist.innerHTML = categories.map(cat => `<option value="${UtilityService.sanitizeHtml(cat)}"></option>`).join('');
     }
@@ -513,23 +521,23 @@ async function loadControlCategories() {
 async function saveControlItem(isEdit, originalControlId) {
   const form = document.getElementById('controlItemForm');
   const formData = new FormData(form);
-  
+
   const controlItem = {
     controlId: formData.get('controlId'),
     controlCategory: formData.get('controlCategory'),
     controlDescription: formData.get('controlDescription')
   };
-  
+
   // Validate
   const errors = controlItemService.validateControlItem(controlItem);
   if (errors.length > 0) {
     notificationService.showValidationErrors(errors, form);
     return;
   }
-  
+
   try {
     const loadingNotification = notificationService.loading(isEdit ? 'Updating control item...' : 'Adding control item...');
-    
+
     if (isEdit) {
       await controlItemService.updateControlItem(currentFrameworkId, originalControlId, controlItem);
       notificationService.hide(loadingNotification);
@@ -539,7 +547,7 @@ async function saveControlItem(isEdit, originalControlId) {
       notificationService.hide(loadingNotification);
       notificationService.success('Control item added successfully');
     }
-    
+
     // Refresh table
     await openFramework(currentFrameworkId);
   } catch (error) {
@@ -560,7 +568,7 @@ function ensureStepperInstance() {
         document.getElementById('saveFrameworkBtn').classList.toggle('d-none', to !== 2);
         const nextBtn = document.querySelector('[data-stepper-control="next"][data-stepper-target="#frameworkStepper"]');
         if (nextBtn) nextBtn.classList.toggle('d-none', to === 2);
-        
+
         // Update step content based on current step
         updateStepContent(to);
       }
@@ -587,10 +595,10 @@ function updateFrameworkDetailsStep() {
   // Setup file upload handler
   const fileInput = document.getElementById('templateFile');
   const filePreview = document.getElementById('filePreview');
-  
+
   if (fileInput && !fileInput.dataset.initialized) {
     fileInput.dataset.initialized = 'true';
-    
+
     fileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) {
@@ -598,7 +606,7 @@ function updateFrameworkDetailsStep() {
         uploadedTemplate = null;
         return;
       }
-      
+
       // Validate file
       const errors = fileUploadService.validateFile(file, 'template');
       if (errors.length > 0) {
@@ -606,7 +614,7 @@ function updateFrameworkDetailsStep() {
         fileInput.value = '';
         return;
       }
-      
+
       try {
         // Show file info
         const fileInfo = fileUploadService.getFileInfo(file);
@@ -617,9 +625,9 @@ function updateFrameworkDetailsStep() {
             <small>Size: ${fileInfo.sizeFormatted}</small>
           </div>
         `;
-        
+
         uploadedTemplate = file;
-        
+
         // Try to parse template for control items
         if (file.name.endsWith('.csv') || file.name.endsWith('.json')) {
           const content = await fileUploadService.readFile(file);
@@ -639,35 +647,35 @@ function updateControlItemsStep() {
   // Load existing items or template items
   const tableBody = document.querySelector('#newFwItemsTable tbody');
   if (!tableBody) return;
-  
+
   // Clear existing rows
   tableBody.innerHTML = '';
-  
+
   // Add items from template if available
   if (currentFrameworkData.controlsFromTemplate) {
     currentFrameworkData.controlsFromTemplate.forEach(item => {
       addItemToTable(item);
     });
   }
-  
+
   // Add mock items button handler
   const addMockBtn = document.querySelector('[data-action="addMockItems"]');
   if (addMockBtn && !addMockBtn.dataset.initialized) {
     addMockBtn.dataset.initialized = 'true';
     addMockBtn.addEventListener('click', () => {
-      addItemToTable({ 
-        controlId: 'Article I-0-1.1', 
-        controlCategory: 'Article I, Business Contact Information', 
-        controlDescription: 'Company and Supplier may Process the other\'s BCI wherever they do business.' 
+      addItemToTable({
+        controlId: 'Article I-0-1.1',
+        controlCategory: 'Article I, Business Contact Information',
+        controlDescription: 'Company and Supplier may Process the other\'s BCI wherever they do business.'
       });
-      addItemToTable({ 
-        controlId: 'Article I-0-1.2', 
-        controlCategory: 'Article I, Business Contact Information', 
-        controlDescription: 'A party will not use or disclose the other party\'s BCI for any marketing purpose without prior written consent.' 
+      addItemToTable({
+        controlId: 'Article I-0-1.2',
+        controlCategory: 'Article I, Business Contact Information',
+        controlDescription: 'A party will not use or disclose the other party\'s BCI for any marketing purpose without prior written consent.'
       });
     });
   }
-  
+
   // Add new item button handler
   const addNewBtn = document.querySelector('[data-action="addNewItem"]');
   if (addNewBtn && !addNewBtn.dataset.initialized) {
@@ -681,7 +689,7 @@ function updateControlItemsStep() {
 function addItemToTable(item) {
   const tableBody = document.querySelector('#newFwItemsTable tbody');
   if (!tableBody) return;
-  
+
   const tr = document.createElement('tr');
   tr.innerHTML = `
     <td>${UtilityService.sanitizeHtml(item.controlId || '')}</td>
@@ -699,20 +707,20 @@ function addItemToTable(item) {
   tableBody.appendChild(tr);
 }
 
-window.editTableItem = function(button) {
+window.editTableItem = function (button) {
   const row = button.closest('tr');
   const cells = row.querySelectorAll('td');
-  
+
   const item = {
     controlId: cells[0].textContent.trim(),
     controlCategory: cells[1].textContent.trim(),
     controlDescription: cells[2].textContent.trim()
   };
-  
+
   showAddControlItemForm(item, row);
 };
 
-window.deleteTableItem = function(button) {
+window.deleteTableItem = function (button) {
   const row = button.closest('tr');
   row.remove();
 };
@@ -751,47 +759,47 @@ function showAddControlItemForm(item = null, rowToReplace = null) {
       </div>
     </div>
   `;
-  
+
   // Remove existing modal
   const existing = document.getElementById('addControlModal');
   if (existing) existing.remove();
-  
+
   document.body.insertAdjacentHTML('beforeend', formHtml);
   const modal = new bootstrap.Modal(document.getElementById('addControlModal'));
-  
+
   // Store row reference for editing
   if (rowToReplace) {
     document.getElementById('addControlModal').dataset.rowToReplace = 'true';
     document.getElementById('addControlModal')._rowToReplace = rowToReplace;
   }
-  
+
   modal.show();
-  
+
   // Cleanup on hide
   document.getElementById('addControlModal').addEventListener('hidden.bs.modal', () => {
     document.getElementById('addControlModal').remove();
   });
 }
 
-window.saveControlToTable = function(isEdit) {
+window.saveControlToTable = function (isEdit) {
   const form = document.getElementById('addControlForm');
   const formData = new FormData(form);
-  
+
   const item = {
     controlId: formData.get('controlId'),
     controlCategory: formData.get('controlCategory'),
     controlDescription: formData.get('controlDescription')
   };
-  
+
   // Validate
   const errors = controlItemService.validateControlItem(item);
   if (errors.length > 0) {
     notificationService.showValidationErrors(errors, form);
     return;
   }
-  
+
   const modal = bootstrap.Modal.getInstance(document.getElementById('addControlModal'));
-  
+
   if (isEdit && document.getElementById('addControlModal')._rowToReplace) {
     // Replace existing row
     const row = document.getElementById('addControlModal')._rowToReplace;
@@ -803,17 +811,17 @@ window.saveControlToTable = function(isEdit) {
     // Add new row
     addItemToTable(item);
   }
-  
+
   modal.hide();
 };
 
 function updateReviewStep() {
   const form = document.getElementById('frameworkForm');
   if (!form) return;
-  
+
   const formData = new FormData(form);
   const tableRows = Array.from(document.querySelectorAll('#newFwItemsTable tbody tr'));
-  
+
   currentFrameworkData = {
     name: formData.get('name'),
     shortName: formData.get('shortName'),
@@ -828,7 +836,7 @@ function updateReviewStep() {
       };
     })
   };
-  
+
   // Display review information
   const reviewContainer = document.getElementById('reviewContent');
   if (reviewContainer) {
@@ -849,12 +857,12 @@ function updateReviewStep() {
           ${currentFrameworkData.controls.length > 0 ? `
             <div style="max-height: 200px; overflow-y: auto;">
               <ul class="list-group list-group-flush">
-                ${currentFrameworkData.controls.map(control => 
-                  `<li class="list-group-item px-0 py-1">
+                ${currentFrameworkData.controls.map(control =>
+      `<li class="list-group-item px-0 py-1">
                     <small><strong>${UtilityService.sanitizeHtml(control.controlId)}</strong><br>
                     ${UtilityService.truncate(control.controlDescription, 60)}</small>
                   </li>`
-                ).join('')}
+    ).join('')}
               </ul>
             </div>
           ` : '<p class="text-muted">No control items added</p>'}
@@ -876,32 +884,32 @@ if (saveBtn) {
         notificationService.error('Framework name is required');
         return;
       }
-      
+
       if (!currentFrameworkData.shortName?.trim()) {
         notificationService.error('Framework short name is required');
         return;
       }
-      
+
       const progressNotification = notificationService.progress('Creating framework...', 0);
-      
+
       // Create framework
       progressNotification.updateProgress(20, 'Creating framework...');
       const result = await frameworkService.createFramework(currentFrameworkData);
-      
+
       progressNotification.updateProgress(80, 'Framework created successfully');
-      
+
       // Refresh list after create
       await loadFrameworks();
-      
+
       progressNotification.complete('Framework created successfully!');
-      
+
       // Close modal
       const modal = bootstrap.Modal.getInstance(document.querySelector('#frameworkModal'));
       if (modal) modal.hide();
-      
+
       // Reset form
       resetFrameworkForm();
-      
+
     } catch (error) {
       notificationService.error(`Failed to create framework: ${error.message}`);
     }
@@ -911,16 +919,16 @@ if (saveBtn) {
 function resetFrameworkForm() {
   const form = document.getElementById('frameworkForm');
   if (form) form.reset();
-  
+
   const tableBody = document.querySelector('#newFwItemsTable tbody');
   if (tableBody) tableBody.innerHTML = '';
-  
+
   const filePreview = document.getElementById('filePreview');
   if (filePreview) filePreview.innerHTML = '';
-  
+
   currentFrameworkData = {};
   uploadedTemplate = null;
-  
+
   // Reset stepper to first step
   if (modalStepper) {
     modalStepper.goTo(0);
@@ -933,7 +941,7 @@ if (frameworkSearchInput) {
   const debouncedSearch = UtilityService.debounce(async (searchTerm) => {
     await loadFrameworks({ search: searchTerm });
   }, 300);
-  
+
   frameworkSearchInput.addEventListener('input', (e) => {
     debouncedSearch(e.target.value);
   });
@@ -956,8 +964,7 @@ if (helpBtn) {
       • Click on a framework to view its control items<br>
       • Use the search bar to find specific frameworks<br>
       • Filter by status to view frameworks in different stages<br>
-      • Click "New Custom Framework" to create a new framework<br>
-      • Export framework data using the Export button
+  • Click "New Custom Framework" to create a new framework
     `, { duration: 10000 });
   });
 }
@@ -989,14 +996,14 @@ document.addEventListener('keydown', (e) => {
       searchInput.select();
     }
   }
-  
+
   // Ctrl/Cmd + N for new framework
   if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
     e.preventDefault();
     const newFrameworkBtn = document.querySelector('[data-bs-target="#frameworkModal"]');
     if (newFrameworkBtn) newFrameworkBtn.click();
   }
-  
+
   // Escape to close modals
   if (e.key === 'Escape') {
     const openModals = document.querySelectorAll('.modal.show');
@@ -1039,10 +1046,11 @@ async function initializeApp() {
   try {
     // Load initial frameworks
     await loadFrameworks();
-  // If URL already points to a framework, open it
-  const initialId = getRouteFrameworkId();
-  if (initialId) openFramework(initialId);
-    
+    // If URL already points to a framework, open it
+    const initialId = getRouteFrameworkId();
+    if (initialId) openFramework(initialId);
+    else updatePageHeader(null);
+
     // Show welcome message for first-time users
     const hasVisited = UtilityService.getStorageWithExpiry('hasVisitedApp');
     if (!hasVisited) {
@@ -1054,7 +1062,7 @@ async function initializeApp() {
         UtilityService.setStorageWithExpiry('hasVisitedApp', true, 30 * 24 * 60 * 60 * 1000); // 30 days
       }, 1000);
     }
-    
+
   } catch (error) {
     notificationService.error(`Failed to initialize application: ${error.message}`);
   }
