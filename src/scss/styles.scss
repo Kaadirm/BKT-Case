@@ -471,6 +471,10 @@ body {
           align-items: flex-start;
           gap: 16px;
 
+          &.hidden {
+            display: none;
+          }
+
           .table-toolbar-controls {
             display: flex;
             flex-wrap: wrap;
@@ -490,7 +494,7 @@ body {
               max-width: 320px;
               overflow: hidden;
 
-              p {
+              label {
                 font-size: 14px;
                 color: $gray-600;
               }

@@ -18,6 +18,7 @@ const notificationService = new NotificationService();
 const listEl = document.getElementById('frameworkList');
 const tableHost = document.getElementById('tableHost');
 const tableToolbar = document.getElementById('tableToolbar');
+const tableCardBody = document.querySelector('.table-card-body');
 const searchInput = document.getElementById('tableSearch');
 const pageSizeSelect = document.getElementById('pageSize');
 
@@ -240,6 +241,10 @@ async function openFramework(id) {
     currentFrameworkId = id;
     activateItem(id);
     tableToolbar.classList.remove('hidden');
+    // Also unhide the container that wraps the toolbar
+    if (tableCardBody) tableCardBody.classList.remove('hidden');
+    // Ensure table container is not using empty-state centering styles
+    tableHost.classList.remove('table-empty-list');
     // Update page title + breadcrumb using visible item title (short name)
     const itemEl = listEl.querySelector(`.framework-item[data-id="${id}"]`);
     const displayName = itemEl?.querySelector('.item-title')?.textContent?.trim() || id;
@@ -266,11 +271,13 @@ async function openFramework(id) {
     if (!table || !tableHost.contains(table.wrapper)) {
       table = new SimpleTable(tableHost, {
         columns: [
-          { key: 'controlId', label: 'Control ID', sortable: true },
-          { key: 'controlCategory', label: 'Control Category', sortable: true },
-          { key: 'controlDescription', label: 'Control Description', sortable: false }
+          { key: 'controlId', label: 'Control ID', sortable: true, width: '18%' },
+          { key: 'controlCategory', label: 'Control Category', sortable: true, width: '26%' },
+          { key: 'controlDescription', label: 'Control Description', sortable: false, width: 'auto' }
         ],
-        pageSize: parseInt(pageSizeSelect.value, 10)
+        pageSize: parseInt(pageSizeSelect.value, 10),
+        caption: 'Control items table',
+        ariaLabel: 'Control items'
       });
 
       // Setup table event handlers
