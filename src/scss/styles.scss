@@ -500,23 +500,78 @@ body {
                 color: $gray-600;
               }
 
-              .search-input {
-                background: transparent;
-                padding: 6px 12px;
-                gap: 4px;
-                font-size: 14px;
-                width: 144px;
-                border: 1px solid $gray-300;
-                border-radius: 8px;
-                color: $color-text;
-                outline: none;
+              .search-input-wrapper {
+                position: relative;
+                display: flex;
+                align-items: center;
 
-                &::placeholder {
+
+                .search-clear {
+                  position: absolute;
+                  right: 8px;
+                  background: none;
+                  border: none;
                   color: $gray-500;
+                  cursor: pointer;
+                  padding: 4px;
+                  border-radius: 4px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  transition: color 0.2s ease;
+                  z-index: 1;
+
+                  &:hover {
+                    color: $gray-700;
+                    background: $gray-100;
+                  }
+
+                  &:focus {
+                    outline: none;
+                    color: $brand-500;
+                  }
                 }
 
-                &:focus {
+                .search-input {
+                  background: transparent;
+                  padding: 6px 12px;
+                  gap: 4px;
+                  font-size: 14px;
+                  width: 144px;
+                  border: 1px solid $gray-300;
+                  border-radius: 8px;
+                  color: $color-text;
                   outline: none;
+                  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+                  // Hide default browser clear button
+                  &::-webkit-search-cancel-button,
+                  &::-webkit-search-decoration {
+                    -webkit-appearance: none;
+                    display: none;
+                  }
+
+                  &::-ms-clear {
+                    display: none;
+                  }
+
+                  &::placeholder {
+                    color: $gray-500;
+                  }
+
+                  // &:focus {
+                  //   outline: none;
+                  //   border-color: $brand-500;
+                  //   box-shadow: 0 0 0 3px rgba(61, 204, 119, 0.1);
+
+                  //   + .search-icon {
+                  //     color: $brand-500;
+                  //   }
+                  // }
+
+                  // &:hover:not(:focus) {
+                  //   border-color: $gray-400;
+                  // }
                 }
               }
             }

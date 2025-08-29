@@ -300,7 +300,30 @@ async function openFramework(id) {
 
       // Setup table event handlers
       const debouncedFilter = UtilityService.debounce((value) => table.filter(value), 300);
-      searchInput.addEventListener('input', (e) => debouncedFilter(e.target.value));
+      const searchClearBtn = document.getElementById('searchClear');
+
+      // Search input handler
+      searchInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        debouncedFilter(value);
+
+        // Show/hide clear button
+        if (searchClearBtn) {
+          searchClearBtn.style.display = value ? 'flex' : 'none';
+        }
+      });
+
+      // Clear search handler
+      if (searchClearBtn) {
+        searchClearBtn.addEventListener('click', () => {
+          searchInput.value = '';
+          table.filter('');
+          searchClearBtn.style.display = 'none';
+          searchInput.focus();
+        });
+      }
+
+      // Page size change handler
       pageSizeSelect.addEventListener('change', (e) => table.setPageSize(parseInt(e.target.value, 10)));
     }
 
