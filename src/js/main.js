@@ -31,6 +31,18 @@ let currentFrameworkId = null;
 let currentLoadingController = null;
 let currentFrameworksController = null;
 
+// Global page size handler setup
+function setupPageSizeHandler() {
+  if (pageSizeSelect && !pageSizeSelect.hasAttribute('data-global-handler')) {
+    pageSizeSelect.addEventListener('change', (e) => {
+      if (table) {
+        table.setPageSize(parseInt(e.target.value, 10));
+      }
+    });
+    pageSizeSelect.setAttribute('data-global-handler', 'true');
+  }
+}
+
 function renderFrameworkItem(item) {
   const li = document.createElement('li');
   // Normalize item fields in case service returns different keys
@@ -333,9 +345,6 @@ async function openFramework(id) {
           searchInput.focus();
         });
       }
-
-      // Page size change handler
-      pageSizeSelect.addEventListener('change', (e) => table.setPageSize(parseInt(e.target.value, 10)));
     }
 
     table.load(rows);
@@ -1090,6 +1099,9 @@ window.addEventListener('unhandledrejection', (e) => {
 // Initialize the application
 async function initializeApp() {
   try {
+    // Setup global handlers
+    setupPageSizeHandler();
+
     // Load initial frameworks
     await loadFrameworks();
     // If URL already points to a framework, open it
