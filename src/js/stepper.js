@@ -106,6 +106,7 @@ const updateStepDisplay = (element, current, config) => {
 
 const updateIndicators = (element, current, config) => {
   const indicators = Array.from(element.querySelectorAll('.step-badge, .step-indicator'));
+  const stepperHead = element.querySelector('.stepper-head');
 
   indicators.forEach((indicator, index) => {
     const stepNumber = index + 1;
@@ -117,6 +118,15 @@ const updateIndicators = (element, current, config) => {
       indicator.classList.add(config.completedClass);
     }
   });
+
+  // Update connector line for step 2+
+  if (stepperHead) {
+    if (current >= 2) {
+      stepperHead.classList.add('step-2-active');
+    } else {
+      stepperHead.classList.remove('step-2-active');
+    }
+  }
 };
 
 const updateNavigation = (element, current, maxSteps, config) => {
@@ -266,6 +276,7 @@ const completeStepper = (state) => {
   const { element, config } = state;
   const steps = Array.from(element.querySelectorAll('.step'));
   const indicators = Array.from(element.querySelectorAll('.step-badge, .step-indicator'));
+  const stepperHead = element.querySelector('.stepper-head');
 
   // Mark all steps as completed
   steps.forEach(step => {
@@ -277,6 +288,11 @@ const completeStepper = (state) => {
     indicator.classList.add(config.completedClass);
     indicator.classList.remove(config.activeClass, config.errorClass);
   });
+
+  // Ensure connector line is active when all steps are completed
+  if (stepperHead) {
+    stepperHead.classList.add('step-2-active');
+  }
 };
 
 const setStepError = (state, stepNumber) => {

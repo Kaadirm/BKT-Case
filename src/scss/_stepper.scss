@@ -8,11 +8,32 @@
         justify-content: space-between;
         padding-bottom: 16px;
         margin: 8px 0;
+        position: relative;
+
+        // Connector line between steps
+        &::before {
+            content: "";
+            position: absolute;
+            top: 18px;
+            left: 52px;
+            right: 52px;
+            height: 2px;
+            background-color: $gray-400;
+            border-radius: 2px;
+            z-index: 1;
+        }
+
+        // Active connector line
+        &.step-2-active::before {
+            background-color: $brand-500;
+        }
 
         .step-indicator-wrapper {
             display: flex;
             flex-direction: column;
             row-gap: 4px;
+            position: relative;
+            z-index: 2;
 
             &:first-child {
                 align-items: start;
@@ -61,25 +82,39 @@
                     z-index: 2;
                 }
 
-                // &.completed {
-                //     background-color: $brand-500;
-                //     color: white;
+                &.completed {
+                    background-color: $color-surface;
+                    color: $white;
+                    border: 1px solid $brand-500;
+                    position: relative;
 
-                //     &::after {
-                //         content: "✓";
-                //         font-size: 0.75rem;
-                //     }
-                // }
+                    span {
+                        z-index: 2;
+                    }
+                }
 
-                // // &.error {
-                // //     background-color: $danger-500;
-                // //     color: white;
+                &.completed::before {
+                    content: "";
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 30px;
+                    height: 30px;
+                    background: $brand-500;
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    z-index: 2;
+                }
 
-                // //     &::after {
-                // //         content: "✗";
-                // //         font-size: 0.75rem;
-                // //     }
-                // // }
+                &.error {
+                    background-color: $danger-500;
+                    color: white;
+
+                    &::after {
+                        content: "✗";
+                        font-size: 0.75rem;
+                    }
+                }
 
                 &.disabled {
                     background-color: $gray-200;
