@@ -39,6 +39,11 @@
             background-color: $gray-100;
             border-radius: 12px;
 
+            &.checkbox-group {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
             .form-label {
                 font-size: 14px;
                 font-weight: 500;
@@ -52,11 +57,15 @@
                 font-size: 16px;
                 color: $gray-600;
                 transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+                font-weight: 400;
+
+                &::placeholder {
+                    font-weight: 400;
+                }
 
                 &:focus {
                     outline: none;
                     border-color: $brand-500;
-                    box-shadow: 0 0 0 0.2rem rgba($brand-500, 0.25);
                 }
 
                 &.invalid {
@@ -66,6 +75,55 @@
                 &[type="file"] {
                     padding: 0.25rem;
                 }
+
+                &[type="checkbox"] {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    box-sizing: border-box;
+                    width: 22px;
+                    height: 22px;
+                    padding: 0;
+                    margin: 0;
+                    position: relative;
+                    background: $color-surface;
+                    border: 1px solid $gray-300;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    display: inline-block;
+                    transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+
+                    &::after {
+                        content: "";
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        font-size: 14px;
+                        color: $white;
+                        transition: opacity 0.12s ease;
+                        opacity: 0;
+                    }
+
+                    &:checked {
+                        border-color: $brand-500;
+                        background: $brand-500;
+
+                        &::after {
+                            content: "✓";
+                            opacity: 1;
+                        }
+                    }
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+
+            }
+
+            textarea {
+                height: 80px;
+                resize: none;
             }
 
             .form-error {
