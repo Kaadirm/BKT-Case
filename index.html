@@ -163,10 +163,13 @@
     <div class="custom-modal-dialog">
       <div class="custom-modal-content">
         <div class="custom-modal-header">
-          <h2 class="custom-modal-title" id="newFrameworkModalLabel">Add New Framework <span
-              class="step-indicator">1/3</span></h2>
-          <button type="button" class="custom-modal-close" onclick="closeNewFrameworkModal()"
-            aria-label="Close">&times;</button>
+          <div class="custom-modal-title-wrapper">
+            <h2 class="custom-modal-title" id="newFrameworkModalLabel">Add New Framework <span
+                class="step-indicator">1/2</span></h2>
+            <p class="custom-modal-description">Please fill in the details of he new framework.</p>
+          </div>
+          <button type="button" class="custom-modal-close modal-close-icon" onclick="closeNewFrameworkModal()"
+            aria-label="Close"></button>
         </div>
         <div class="custom-modal-body">
           <div id="frameworkStepper" class="stepper" data-step="1">
@@ -201,19 +204,22 @@
                 <div class="form-row">
                   <div class="form-group full-width">
                     <label class="form-label">Upload Framework Logo</label>
-                    <input type="file" class="form-input" />
+                    <input id="logoFile" name="logo" type="file" class="form-input" />
+                    <div id="logoPreview" class="file-preview" aria-hidden="true"></div>
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-group full-width">
                     <label class="form-label">Description</label>
-                    <textarea class="form-input" rows="3" placeholder="Please add description"></textarea>
+                    <textarea name="description" class="form-input" rows="3"
+                      placeholder="Please add description"></textarea>
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-group full-width">
                     <label class="form-label">Upload Template</label>
-                    <input type="file" class="form-input" />
+                    <input id="templateFile" name="template" type="file" accept=".csv,.json,.xlsx" class="form-input" />
+                    <div id="filePreview" class="file-preview" aria-live="polite"></div>
                   </div>
                 </div>
               </form>

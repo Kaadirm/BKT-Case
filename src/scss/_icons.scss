@@ -52,3 +52,10 @@
     background-image: url('/public/icons/compliance-framework.svg');
     display: inline-block;
 }
+
+.modal-close-icon {
+    @extend .icon;
+    width: 20px;
+    height: 20px;
+    background-image: url('/public/icons/close.svg');
+}

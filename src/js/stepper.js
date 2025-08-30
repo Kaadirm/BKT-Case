@@ -1,5 +1,3 @@
-// Generic Stepper Module - No constructors, pure functional approach
-// State management for stepper instances
 const stepperInstances = new Map();
 
 // Default configuration
@@ -25,7 +23,11 @@ const getStepperState = (element) => {
 
 const setStepperState = (element, state) => {
   const id = element.id || element.dataset.stepperId || Math.random().toString(36);
-  if (!element.id && !element.dataset.stepperId) {
+  // Ensure the element has a stable id so external controls can target it
+  if (!element.id) {
+    element.id = id;
+  }
+  if (!element.dataset.stepperId) {
     element.dataset.stepperId = id;
   }
   stepperInstances.set(id, state);
@@ -92,12 +94,13 @@ const updateStepDisplay = (element, current, config) => {
 
     if (stepNumber === current) {
       step.classList.add(config.activeClass);
+      step.setAttribute('aria-hidden', 'false');
     } else if (stepNumber < current) {
       step.classList.add(config.completedClass);
+      step.setAttribute('aria-hidden', 'true');
+    } else {
+      step.setAttribute('aria-hidden', 'true');
     }
-
-    // CSS-based visibility
-    step.style.display = stepNumber === current ? 'block' : 'none';
   });
 };
 
@@ -117,8 +120,19 @@ const updateIndicators = (element, current, config) => {
 };
 
 const updateNavigation = (element, current, maxSteps, config) => {
-  const prevBtns = element.querySelectorAll('[data-stepper-control="prev"]');
-  const nextBtns = element.querySelectorAll('[data-stepper-control="next"]');
+  // Find all controls in the document that target this stepper element
+  const allControls = Array.from(document.querySelectorAll('[data-stepper-target]'));
+  const controlsForThis = allControls.filter(btn => {
+    try {
+      const targetSel = btn.getAttribute('data-stepper-target');
+      return document.querySelector(targetSel) === element;
+    } catch (e) {
+      return false;
+    }
+  });
+
+  const prevBtns = controlsForThis.filter(b => b.getAttribute('data-stepper-control') === 'prev');
+  const nextBtns = controlsForThis.filter(b => b.getAttribute('data-stepper-control') === 'next');
 
   prevBtns.forEach(btn => {
     btn.disabled = current <= 1;
@@ -130,7 +144,7 @@ const updateNavigation = (element, current, maxSteps, config) => {
     btn.classList.toggle(config.disabledClass, current >= maxSteps);
   });
 
-  // Update step counter
+  // Update step counter inside the stepper element
   const stepCounter = element.querySelector('.step-indicator, .step-counter');
   if (stepCounter) {
     stepCounter.textContent = `${current}/${maxSteps}`;
