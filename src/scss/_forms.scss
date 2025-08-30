@@ -3,13 +3,17 @@
 // Form styles
 .custom-form {
     .form-notice {
-        padding: 0.75rem;
-        background-color: #e3f2fd;
-        border: 1px solid #bbdefb;
-        border-radius: 0.25rem;
-        color: #1976d2;
-        font-size: 0.875rem;
+        color: $info-500;
+        font-size: 14px;
         margin-bottom: 1rem;
+        box-sizing: border-box;
+        padding: 16px;
+        height: 53px;
+        display: flex;
+        align-items: center;
+        background-color: $info-100;
+        border: 0.8px solid $info-500;
+        border-radius: 8px;
     }
 
     .form-row {
