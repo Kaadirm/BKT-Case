@@ -758,6 +758,14 @@ async function initializeApp() {
   // Setup global handlers
   setupPageSizeHandler();
 
+  const templateInput = document.getElementById('templateFile');
+  const templateFileName = document.getElementById('templateFileName');
+  if (templateInput && templateFileName) {
+    templateInput.addEventListener('change', function () {
+      templateFileName.textContent = templateInput.files && templateInput.files.length > 0 ? templateInput.files[0].name : 'No file chosen';
+    });
+  }
+
   // Load initial frameworks
   await loadFrameworks();
   // If URL already points to a framework, open it
