@@ -204,12 +204,27 @@ export function createSimpleTable(host, { columns, pageSize = 10, tableClass = '
 
       state.pag.appendChild(makeBtn('Previous', state.currentPage === 1, Math.max(1, state.currentPage - 1)));
 
-      // Simple pager: show up to 5 pages centered
-      const range = 2;
-      const startPage = Math.max(1, state.currentPage - range);
-      const endPage = Math.min(pages, state.currentPage + range);
+      state.pag.appendChild(makeBtn('Next', false, 0));
 
-      // Show first page if not in range
+      state.pag.removeChild(state.pag.lastChild);
+
+      let startPage = 1;
+      let endPage = pages;
+
+      if (pages <= 7) {
+        startPage = 1;
+        endPage = pages;
+      } else if (state.currentPage <= 4) {
+        startPage = 1;
+        endPage = 4;
+      } else if (state.currentPage >= pages - 3) {
+        startPage = pages - 3;
+        endPage = pages;
+      } else {
+        startPage = state.currentPage - 1;
+        endPage = state.currentPage + 1;
+      }
+
       if (startPage > 1) {
         state.pag.appendChild(makeBtn('1', false, 1));
         if (startPage > 2) {
@@ -226,7 +241,6 @@ export function createSimpleTable(host, { columns, pageSize = 10, tableClass = '
         state.pag.appendChild(b);
       }
 
-      // Show last page if not in range
       if (endPage < pages) {
         if (endPage < pages - 1) {
           const ellipsis = document.createElement('span');
