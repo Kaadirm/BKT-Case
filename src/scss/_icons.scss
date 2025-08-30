@@ -44,3 +44,11 @@
     height: 96px;
     background-image: url('/public/icons/empty-list.svg');
 }
+
+.compliance-framework-icon {
+    @extend .icon;
+    width: 44px;
+    height: 48px;
+    background-image: url('/public/icons/compliance-framework.svg');
+    display: inline-block;
+}

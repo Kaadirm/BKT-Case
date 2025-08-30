@@ -144,34 +144,6 @@
                     }
                 }
 
-                .pagination-controls {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-
-                    .pagination-label {
-                        font-size: 14px;
-                        color: $color-text-secondary;
-                        margin: 0;
-                        white-space: nowrap;
-                    }
-
-                    .pagination-select {
-                        border: 1px solid $color-border;
-                        border-radius: 6px;
-                        padding: 6px 8px;
-                        font-size: 14px;
-                        background: $color-surface;
-                        color: $color-text;
-                        width: 86px;
-                        cursor: pointer;
-
-                        &:focus {
-                            outline: none;
-                            border-color: $brand-500;
-                        }
-                    }
-                }
             }
 
             .custom-table-container {
@@ -312,6 +284,14 @@
                             width: 68px;
                             cursor: pointer;
                             box-sizing: border-box;
+                            -webkit-appearance: none;
+                            -moz-appearance: none;
+                            appearance: none;
+                            background-repeat: no-repeat;
+                            background-position: right 10px center;
+                            background-size: 12px 12px;
+                            background-image: url('/public/icons/down-arrow.svg');
+                            padding-right: 30px; // space for the arrow
                         }
                     }
 
