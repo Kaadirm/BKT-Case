@@ -3,7 +3,7 @@
 // Table Layout Styles
 .table-layout {
     display: flex;
-    gap: 16px;
+    gap: 6px;
     padding: 16px;
 
     .table-sidebar {
@@ -31,6 +31,7 @@
                 /* WebKit */
             }
 
+            padding-right: 10px;
             flex: none;
             order: 0;
             flex-grow: 1;

@@ -259,6 +259,13 @@
                                     width: 210px;
                                 }
                             }
+
+                            .no-data {
+                                text-align: center;
+                                padding: 20px;
+                                color: $gray-600;
+                                font-style: italic;
+                            }
                         }
                     }
                 }

@@ -156,22 +156,32 @@ export function createSimpleTable(host, { columns, pageSize = 10, tableClass = '
 
     // Render rows
     state.tbody.innerHTML = '';
-    for (const row of pageRows) {
+    if (pageRows.length === 0) {
       const tr = document.createElement('tr');
-      for (const col of state.columns) {
-        const td = document.createElement('td');
-
-        if (col.render && typeof col.render === 'function') {
-          // Use custom render function for this column
-          td.innerHTML = col.render(row[col.key], row);
-        } else {
-          // Default text rendering
-          td.textContent = row[col.key] ?? '';
-        }
-
-        tr.appendChild(td);
-      }
+      const td = document.createElement('td');
+      td.colSpan = state.columns.length;
+      td.textContent = 'No data found';
+      td.className = 'no-data';
+      tr.appendChild(td);
       state.tbody.appendChild(tr);
+    } else {
+      for (const row of pageRows) {
+        const tr = document.createElement('tr');
+        for (const col of state.columns) {
+          const td = document.createElement('td');
+
+          if (col.render && typeof col.render === 'function') {
+            // Use custom render function for this column
+            td.innerHTML = col.render(row[col.key], row);
+          } else {
+            // Default text rendering
+            td.textContent = row[col.key] ?? '';
+          }
+
+          tr.appendChild(td);
+        }
+        state.tbody.appendChild(tr);
+      }
     }
 
     // Info text
