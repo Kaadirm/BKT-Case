@@ -30,6 +30,9 @@ let currentFrameworkId = null;
 let currentLoadingController = null;
 let currentFrameworksController = null;
 
+// Show skeleton loading immediately when script loads
+showSkeletonLoading(8);
+
 // Global page size handler setup
 function setupPageSizeHandler() {
   if (pageSizeSelect && !pageSizeSelect.hasAttribute('data-global-handler')) {
@@ -51,9 +54,6 @@ function showSkeletonLoading(count = 5) {
 
 async function loadFrameworks(options = {}) {
   try {
-    // Show skeleton loading state
-    showSkeletonLoading(8);
-
     // Cancel any in-flight list load
     if (currentFrameworksController) {
       currentFrameworksController.abort();
@@ -62,7 +62,7 @@ async function loadFrameworks(options = {}) {
     currentFrameworksController = new AbortController();
     const items = await frameworkService.getFrameworks();
 
-    // Clear skeleton items
+    // Clear skeleton items and render actual frameworks
     listEl.innerHTML = '';
 
     for (const item of items) {
