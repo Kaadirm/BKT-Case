@@ -2,7 +2,8 @@
 export { Api } from './api.js';
 export { FrameworkService } from './framework-service.js';
 export { ControlItemService } from './control-item-service.js';
-export { FileUploadService } from './file-upload-service.js';
+import fileUploadService from './file-upload-service.js';
+export { fileUploadService };
 export { UtilityService } from './utility-service.js';
 
 // Service factory for creating configured service instances
@@ -36,14 +37,14 @@ export class ServiceFactory {
 
   get controlItemService() {
     if (!this._controlItemService) {
-      this._controlItemService = new ControlItemService(this.api);
+      this._controlItemService = ControlItemService(this.api);
     }
     return this._controlItemService;
   }
 
   get fileUploadService() {
     if (!this._fileUploadService) {
-      this._fileUploadService = new FileUploadService();
+      this._fileUploadService = fileUploadService;
     }
     return this._fileUploadService;
   }

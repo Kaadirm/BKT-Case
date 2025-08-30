@@ -53,12 +53,6 @@ export class Api {
     return res.json();
   }
 
-  async getFrameworkById(id, options = {}) {
-    const { signal } = options;
-    const pick = (res) => res?.data ?? res;
-    return pick(await this._service(`/frameworks/${encodeURIComponent(id)}`, { abortable: true, signal }));
-  }
-
   async uploadFrameworkTemplate(file) {
     const url = `${this.serviceBase}/frameworks/upload-template`;
     const formData = new FormData();
@@ -71,22 +65,4 @@ export class Api {
     return res.json();
   }
 
-
-  async getFrameworkStatistics() {
-    const url = `${this.serviceBase}/frameworks/statistics`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-
-  // Additional control methods
-  async getAllControls() {
-    const pick = (res) => Array.isArray(res) ? res : (res?.data ?? res?.items ?? res?.rows ?? []);
-    return pick(await this._service('/controls'));
-  }
-
-  async getControlById(id) {
-    const pick = (res) => res?.data ?? res;
-    return pick(await this._service(`/controls/${encodeURIComponent(id)}`));
-  }
 }
