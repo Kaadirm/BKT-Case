@@ -88,6 +88,7 @@
                 color: $gray-900;
                 display: flex;
                 column-gap: 8px;
+                align-items: center;
 
                 .step-indicator {
                     color: $white;
@@ -96,6 +97,7 @@
                     border-radius: 8px;
                     background-color: $gray-400;
                     padding: 2px 6px;
+                    line-height: 27px;
                 }
             }
 
@@ -125,19 +127,26 @@
     .custom-modal-footer {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
         padding: 1rem 1.5rem;
-        border-top: 1px solid rgba(0, 0, 0, 0.125);
 
         .modal-footer-content {
             display: flex;
             width: 100%;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
 
             .modal-footer-actions {
                 display: flex;
-                gap: 0.5rem;
+                gap: 4px;
+                align-items: center;
+
+                .modal-functional-actions {
+                    display: flex;
+                    gap: 4px;
+                    align-items: center;
+                }
+
             }
         }
     }

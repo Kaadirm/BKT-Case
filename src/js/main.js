@@ -435,26 +435,7 @@ function updateModalTitle(step) {
   }
 }
 
-function updateModalButtons(step) {
-  const saveBtn = document.getElementById('saveFrameworkBtn');
-  const nextBtn = document.querySelector('[data-stepper-control="next"][data-stepper-target="#frameworkStepper"]');
-  const prevBtn = document.querySelector('[data-stepper-control="prev"][data-stepper-target="#frameworkStepper"]');
-
-  if (saveBtn) {
-    saveBtn.classList.toggle('hidden', step !== 2);
-  }
-
-  if (nextBtn) {
-    nextBtn.classList.toggle('hidden', step === 2);
-    // Update button text based on step
-    const buttonText = step === 1 ? 'Next › Control Items' : 'Next';
-    nextBtn.innerHTML = buttonText;
-  }
-
-  if (prevBtn) {
-    prevBtn.style.display = step === 1 ? 'none' : 'inline-block';
-  }
-}
+function updateModalButtons(step) { /* managed by stepper.js updateNavigation */ }
 
 function validateFrameworkDetails() {
   const form = document.getElementById('frameworkForm');
@@ -814,6 +795,8 @@ window.openNewFrameworkModal = function () {
       stepper.reset(); // Go to step 1
     }
 
+    // Optionally set functional actions here if needed
+
     // Focus first input
     setTimeout(() => {
       const firstInput = modal.querySelector('input[name="name"]');
@@ -841,3 +824,30 @@ window.closeNewFrameworkModal = function () {
 
 // Start the application
 initializeApp();
+
+function setModalFunctionalActions(buttons = []) {
+  const container = document.getElementById('modalFunctionalActions');
+  if (!container) return;
+  container.innerHTML = '';
+  buttons.forEach(cfg => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = cfg.id || '';
+    btn.className = 'btn btn-functional';
+    btn.innerHTML = `
+      <span class="icon" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/>
+        </svg>
+      </span>
+      <span class="label">${UtilityService.sanitizeHtml(cfg.label || 'Action')}</span>
+    `;
+    if (typeof cfg.onClick === 'function') {
+      btn.addEventListener('click', cfg.onClick);
+    }
+    container.appendChild(btn);
+  });
+}
+
+// Expose for extensibility
+window.setModalFunctionalActions = setModalFunctionalActions;

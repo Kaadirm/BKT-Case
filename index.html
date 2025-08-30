@@ -210,19 +210,22 @@
                 <div class="form-row">
                   <div class="form-group full-width">
                     <label class="form-label">Description</label>
-                    <textarea name="description" class="form-input" rows="4"
+                    <textarea name="description" class="form-input" rows="4" required
                       placeholder="Please add description"></textarea>
+                    <div class="form-error">Description is required.</div>
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-group full-width">
                     <label class="form-label">Upload Template</label>
                     <div class="custom-file-upload">
-                      <label for="templateFile" class="file-upload-label">Select File</label>
-                      <input id="templateFile" name="template" type="file" accept=".csv,.json,.xlsx" />
-                      <span class="file-upload-filename" id="templateFileName"></span>
+                      <div class="file-upload-wrapper">
+                        <label for="templateFile" class="file-upload-label">Select File</label>
+                        <span class="file-upload-filename" id="templateFileName"></span>
+                      </div>
+                      <input id="templateFile" name="template" type="file" accept=".csv,.json,.xlsx" required />
+                      <div class="form-error">Template file is required.</div>
                     </div>
-                    <div id="filePreview" class="file-preview" aria-live="polite"></div>
                   </div>
                 </div>
               </form>
@@ -247,15 +250,28 @@
         </div>
         <div class="custom-modal-footer">
           <div class="modal-footer-content">
-            <div>
-              <button class="btn-secondary" data-stepper-control="prev" data-stepper-target="#frameworkStepper">Previous
-                Step</button>
-            </div>
             <div class="modal-footer-actions">
-              <button class="btn-outline-secondary" onclick="closeNewFrameworkModal()">Cancel</button>
-              <button class="btn-success" data-stepper-control="next" data-stepper-target="#frameworkStepper">Next ›
+              <button class="btn btn-outline-secondary" data-stepper-cancel data-stepper-target="#frameworkStepper"
+                onclick="closeNewFrameworkModal()">Cancel</button>
+              <button class="btn btn-outline-secondary modal-prev" data-stepper-control="prev"
+                data-stepper-target="#frameworkStepper">Previous Step</button>
+              <div id="modalFunctionalActions" class="modal-functional-actions" data-stepper-functional-actions
+                data-stepper-target="#frameworkStepper" style="display: none; gap: 8px;">
+                <!-- Example functional action; you can add more of these dynamically -->
+                <button type="button" id="addControlItemsBtn" class="btn btn-functional">
+                  <span class="icon" aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z" />
+                    </svg>
+                  </span>
+                  <span class="label">Add Control Items</span>
+                </button>
+              </div>
+              <button class="btn btn-success" data-stepper-control="next" data-stepper-target="#frameworkStepper">Next ›
                 Control Items</button>
-              <button class="btn-primary hidden" id="saveFrameworkBtn">Save</button>
+              <button class="btn btn-success" data-stepper-save data-stepper-target="#frameworkStepper"
+                id="saveFrameworkBtn">Save</button>
             </div>
           </div>
         </div>

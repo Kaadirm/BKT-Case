@@ -143,15 +143,65 @@ const updateNavigation = (element, current, maxSteps, config) => {
 
   const prevBtns = controlsForThis.filter(b => b.getAttribute('data-stepper-control') === 'prev');
   const nextBtns = controlsForThis.filter(b => b.getAttribute('data-stepper-control') === 'next');
+  const cancelBtns = Array.from(document.querySelectorAll('[data-stepper-cancel]')).filter(btn => {
+    try {
+      const targetSel = btn.getAttribute('data-stepper-target');
+      return targetSel ? document.querySelector(targetSel) === element : false;
+    } catch (e) { return false; }
+  });
+  const saveBtns = Array.from(document.querySelectorAll('[data-stepper-save]')).filter(btn => {
+    try {
+      const targetSel = btn.getAttribute('data-stepper-target');
+      return targetSel ? document.querySelector(targetSel) === element : false;
+    } catch (e) { return false; }
+  });
+  const functionalGroups = Array.from(document.querySelectorAll('[data-stepper-functional-actions]')).filter(node => {
+    try {
+      const targetSel = node.getAttribute('data-stepper-target');
+      return targetSel ? document.querySelector(targetSel) === element : false;
+    } catch (e) { return false; }
+  });
+
+  // Determine next step label from header labels
+  let nextLabel = '';
+  const labelEls = element.querySelectorAll('.stepper-head .step-label');
+  if (labelEls && labelEls[current]) {
+    nextLabel = labelEls[current].textContent.trim();
+  }
 
   prevBtns.forEach(btn => {
+    btn.classList.add('btn', 'btn-outline-secondary');
     btn.disabled = current <= 1;
     btn.classList.toggle(config.disabledClass, current <= 1);
+    // Hide prev on first step per requirement
+    btn.style.display = current <= 1 ? 'none' : 'inline-flex';
   });
 
   nextBtns.forEach(btn => {
+    btn.classList.add('btn', 'btn-success');
     btn.disabled = current >= maxSteps;
     btn.classList.toggle(config.disabledClass, current >= maxSteps);
+    // Show next only when not on last step
+    btn.style.display = current >= maxSteps ? 'none' : 'inline-flex';
+    if (current < maxSteps) {
+      btn.innerHTML = nextLabel ? `Next › ${nextLabel}` : 'Next';
+    }
+  });
+
+  // Ensure Cancel buttons use outline style
+  cancelBtns.forEach(btn => {
+    btn.classList.add('btn', 'btn-outline-secondary');
+  });
+
+  // Toggle Save visibility (only last step) and enforce success style
+  saveBtns.forEach(btn => {
+    btn.classList.add('btn', 'btn-success');
+    btn.style.display = current >= maxSteps ? 'inline-flex' : 'none';
+  });
+
+  // Functional actions group: visible only on last step
+  functionalGroups.forEach(group => {
+    group.style.display = current >= maxSteps ? 'flex' : 'none';
   });
 
   // Update step counter inside the stepper element
