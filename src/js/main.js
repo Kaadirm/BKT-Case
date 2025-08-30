@@ -1,14 +1,14 @@
 import { createStepper, getStepper } from './stepper.js';
-import { SimpleTable } from './table.js';
-import { Api } from './services/api.js';
-import { FrameworkService } from './services/framework-service.js';
+import { createSimpleTable } from './table.js';
+import { createApi } from './services/api.js';
+import { createFrameworkService } from './services/framework-service.js';
 import { ControlItemService } from './services/control-item-service.js';
 import fileUploadService from './services/file-upload-service.js';
 import { UtilityService } from './services/utility-service.js';
 
 // Initialize services
-const api = new Api({ serviceBase: 'https://bk-backend.vercel.app/api/v1' });
-const frameworkService = new FrameworkService(api);
+const api = createApi({ serviceBase: 'https://bk-backend.vercel.app/api/v1' });
+const frameworkService = createFrameworkService(api);
 const controlItemService = ControlItemService(api);
 
 // Framework list + table init
@@ -340,7 +340,7 @@ async function openFramework(id) {
         // Get the pagination container
         const pageNavContainer = document.getElementById('pageNav');
 
-        table = new SimpleTable(tableContainer, {
+        table = createSimpleTable(tableContainer, {
           columns: [
             { key: 'controlId', label: 'Control ID', sortable: true, width: '18%' },
             { key: 'controlCategory', label: 'Control Category', sortable: true, width: '26%' },

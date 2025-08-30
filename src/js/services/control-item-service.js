@@ -1,7 +1,7 @@
-import { Api } from './api.js';
+import { createApi } from './api.js';
 
 export function ControlItemService(apiInstance = null) {
-  const api = apiInstance || new Api();
+  const api = apiInstance || createApi();
 
   return {
     /**
@@ -9,7 +9,7 @@ export function ControlItemService(apiInstance = null) {
      */
     async getControlItems(frameworkId, options = {}) {
       const { search, category, sortBy = 'controlId', sortOrder = 'asc', signal } = options;
-      let controls = await api.getFrameworkRows(frameworkId, { signal });
+      let controls = await api.getControlsbyFrameworkId(frameworkId, { signal });
       return controls;
     }
   };

@@ -1,72 +1,75 @@
 // Main API and Service exports
-export { Api } from './api.js';
-export { FrameworkService } from './framework-service.js';
+import { createApi } from './api.js';
+export { createApi };
+export { createFrameworkService } from './framework-service.js';
 export { ControlItemService } from './control-item-service.js';
 import fileUploadService from './file-upload-service.js';
 export { fileUploadService };
 export { UtilityService } from './utility-service.js';
 
 // Service factory for creating configured service instances
-export class ServiceFactory {
-  constructor(config = {}) {
-    this.config = {
+export function createServiceFactory(config = {}) {
+  const state = {
+    config: {
       serviceBase: 'https://bk-backend.vercel.app/api/v1',
       ...config
-    };
+    },
+    _api: null,
+    _frameworkService: null,
+    _controlItemService: null,
+    _fileUploadService: null
+  };
 
-    this._api = null;
-    this._frameworkService = null;
-    this._controlItemService = null;
-    this._fileUploadService = null;
-  }
+  const reset = () => {
+    state._api = null;
+    state._frameworkService = null;
+    state._controlItemService = null;
+    state._fileUploadService = null;
+  };
 
-  get api() {
-    if (!this._api) {
-      const { serviceBase } = this.config;
-      this._api = new Api({ serviceBase });
-    }
-    return this._api;
-  }
+  const updateConfig = (newConfig) => {
+    state.config = { ...state.config, ...newConfig };
+    reset();
+  };
 
-  get frameworkService() {
-    if (!this._frameworkService) {
-      this._frameworkService = new FrameworkService(this.api);
-    }
-    return this._frameworkService;
-  }
+  return {
+    get api() {
+      if (!state._api) {
+        const { serviceBase } = state.config;
+        state._api = createApi({ serviceBase });
+      }
+      return state._api;
+    },
 
-  get controlItemService() {
-    if (!this._controlItemService) {
-      this._controlItemService = ControlItemService(this.api);
-    }
-    return this._controlItemService;
-  }
+    get frameworkService() {
+      if (!state._frameworkService) {
+        state._frameworkService = createFrameworkService(this.api);
+      }
+      return state._frameworkService;
+    },
 
-  get fileUploadService() {
-    if (!this._fileUploadService) {
-      this._fileUploadService = fileUploadService;
-    }
-    return this._fileUploadService;
-  }
+    get controlItemService() {
+      if (!state._controlItemService) {
+        state._controlItemService = ControlItemService(this.api);
+      }
+      return state._controlItemService;
+    },
 
-  get utilityService() {
-    return UtilityService; // Static class
-  }
+    get fileUploadService() {
+      if (!state._fileUploadService) {
+        state._fileUploadService = fileUploadService;
+      }
+      return state._fileUploadService;
+    },
 
-  // Reset all service instances (useful for testing or config changes)
-  reset() {
-    this._api = null;
-    this._frameworkService = null;
-    this._controlItemService = null;
-    this._fileUploadService = null;
-  }
+    get utilityService() {
+      return UtilityService;
+    },
 
-  // Update configuration
-  updateConfig(newConfig) {
-    this.config = { ...this.config, ...newConfig };
-    this.reset(); // Reset instances to use new config
-  }
+    reset,
+    updateConfig
+  };
 }
 
 // Create default service factory instance
-export const services = new ServiceFactory();
+export const services = createServiceFactory();
