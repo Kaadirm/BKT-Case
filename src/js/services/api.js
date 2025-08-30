@@ -53,26 +53,6 @@ export class Api {
     return res.json();
   }
 
-  async updateFramework(id, payload) {
-    const url = `${this.serviceBase}/frameworks/${encodeURIComponent(id)}`;
-    const res = await fetch(url, {
-      method: 'PATCH', // Use PATCH instead of PUT to match NestJS convention
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-
-  async deleteFramework(id) {
-    const url = `${this.serviceBase}/frameworks/${encodeURIComponent(id)}`;
-    const res = await fetch(url, {
-      method: 'DELETE'
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-
   async getFrameworkById(id, options = {}) {
     const { signal } = options;
     const pick = (res) => res?.data ?? res;
