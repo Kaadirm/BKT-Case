@@ -41,7 +41,37 @@
         border: none;
         border-radius: 16px;
         max-height: 90vh;
-        overflow: hidden;
+        overflow: auto;
+
+        // Custom scrollbar styles
+        &::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+            display: block;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: rgba($color-surface, 0.5);
+            border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba($brand-100, 0.8);
+            border-radius: 4px;
+            transition: background 0.2s ease;
+
+            &:hover {
+                background: $brand-500;
+            }
+        }
+
+        &::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+
+        /* Firefox scrollbar */
+        scrollbar-color: rgba($brand-100, 0.8) rgba($color-surface, 0.5);
+        scrollbar-width: thin;
     }
 
     .custom-modal-header {
@@ -89,7 +119,6 @@
     .custom-modal-body {
         position: relative;
         flex: 1 1 auto;
-        max-height: calc(90vh - 200px);
         overflow-y: auto;
     }
 

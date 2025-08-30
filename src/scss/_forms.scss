@@ -2,6 +2,10 @@
 
 // Form styles
 .custom-form {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+
     .form-notice {
         color: $info-500;
         font-size: 14px;
@@ -18,8 +22,7 @@
 
     .form-row {
         display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
+        column-gap: 8px;
 
         &.full-width {
             .form-group {
@@ -31,18 +34,23 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            row-gap: 8px;
+            padding: 16px;
+            background-color: $gray-100;
+            border-radius: 12px;
 
             .form-label {
-                margin-bottom: 0.5rem;
+                font-size: 14px;
                 font-weight: 500;
-                color: $color-text;
+                color: $gray-600;
             }
 
             .form-input {
-                padding: 0.5rem 0.75rem;
+                padding: 6px 12px;
                 border: 1px solid $gray-300;
-                border-radius: 0.25rem;
-                font-size: 1rem;
+                border-radius: 8px;
+                font-size: 16px;
+                color: $gray-600;
                 transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
                 &:focus {
