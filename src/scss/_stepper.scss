@@ -6,52 +6,80 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 1.5rem;
+        padding-bottom: 16px;
+        margin: 8px 0;
 
         .step-indicator-wrapper {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            flex-direction: column;
+            row-gap: 4px;
+
+            &:first-child {
+                align-items: start;
+            }
+
+            &:nth-child(2) {
+                align-items: end;
+            }
 
             .step-badge {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                width: 2rem;
-                height: 2rem;
+                width: 36px;
+                height: 36px;
+                border: 1px solid $gray-400;
                 border-radius: 50%;
-                background-color: $gray-300;
-                color: $color-text;
+                background-color: $color-surface;
+                color: $gray-600;
                 font-weight: 600;
-                font-size: 0.875rem;
+                font-size: 14px;
                 transition: all 0.2s ease-in-out;
                 cursor: pointer;
 
                 &.active {
-                    background-color: $brand-500;
-                    color: white;
-                    transform: scale(1.05);
-                }
+                    background-color: $color-surface;
+                    color: $white;
+                    border: 1px solid $brand-500;
+                    position: relative;
 
-                &.completed {
-                    background-color: $brand-500;
-                    color: white;
-
-                    &::after {
-                        content: "✓";
-                        font-size: 0.75rem;
+                    span {
+                        z-index: 2;
                     }
                 }
 
-                &.error {
-                    background-color: $danger-500;
-                    color: white;
-
-                    &::after {
-                        content: "✗";
-                        font-size: 0.75rem;
-                    }
+                &.active::before {
+                    content: "";
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 30px;
+                    height: 30px;
+                    background: $brand-500;
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    z-index: 2;
                 }
+
+                // &.completed {
+                //     background-color: $brand-500;
+                //     color: white;
+
+                //     &::after {
+                //         content: "✓";
+                //         font-size: 0.75rem;
+                //     }
+                // }
+
+                // // &.error {
+                // //     background-color: $danger-500;
+                // //     color: white;
+
+                // //     &::after {
+                // //         content: "✗";
+                // //         font-size: 0.75rem;
+                // //     }
+                // // }
 
                 &.disabled {
                     background-color: $gray-200;
@@ -66,22 +94,9 @@
             }
 
             .step-label {
-                font-weight: 500;
-                color: $color-text;
-                transition: color 0.2s ease-in-out;
-            }
-
-            &:has(.step-badge.active) .step-label {
-                color: $brand-500;
-                font-weight: 600;
-            }
-
-            &:has(.step-badge.completed) .step-label {
-                color: $brand-500;
-            }
-
-            &:has(.step-badge.error) .step-label {
-                color: $danger-500;
+                font-weight: 400;
+                font-size: 14px;
+                color: $gray-900;
             }
         }
     }
