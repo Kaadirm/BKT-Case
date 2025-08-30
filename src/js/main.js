@@ -734,10 +734,53 @@ window.addEventListener('unhandledrejection', (e) => {
   console.error('Unhandled promise rejection:', e.reason);
 });
 
+// Setup form validation error clearing
+function setupFormValidationClearing() {
+  const form = document.getElementById('frameworkForm');
+  if (!form) return;
+
+  // Clear validation errors when user starts typing in text inputs and textareas
+  const textInputs = form.querySelectorAll('input[type="text"], input:not([type]), textarea');
+  textInputs.forEach(input => {
+    // Remove any existing listeners to prevent duplicates
+    input.removeEventListener('input', clearInputErrorHandler);
+    input.addEventListener('input', clearInputErrorHandler);
+  });
+
+  // Clear validation errors when user selects a file
+  const fileInput = form.querySelector('input[type="file"]');
+  if (fileInput) {
+    fileInput.removeEventListener('change', clearInputErrorHandler);
+    fileInput.addEventListener('change', clearInputErrorHandler);
+  }
+
+  // Clear validation errors when user checks/unchecks checkboxes
+  const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.removeEventListener('change', clearInputErrorHandler);
+    checkbox.addEventListener('change', clearInputErrorHandler);
+  });
+}
+
+// Event handler function to clear input error
+function clearInputErrorHandler(event) {
+  clearInputError(event.target);
+}
+
+// Helper function to clear individual input error
+function clearInputError(input) {
+  input.classList.remove('invalid');
+  const errorEl = input.parentElement.querySelector('.form-error');
+  if (errorEl) {
+    errorEl.classList.remove('visible');
+  }
+}
+
 // Initialize the application
 async function initializeApp() {
   // Setup global handlers
   setupPageSizeHandler();
+  setupFormValidationClearing();
 
   const templateInput = document.getElementById('templateFile');
   const templateFileName = document.getElementById('templateFileName');
@@ -787,6 +830,8 @@ window.openNewFrameworkModal = function () {
     // Clear validation errors
     const form = document.getElementById('frameworkForm');
     if (form) {
+      // Re-setup form validation clearing after reset
+      setupFormValidationClearing();
     }
 
     // Initialize stepper
