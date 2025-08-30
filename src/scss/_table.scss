@@ -170,6 +170,14 @@
                             line-height: 21px;
                             position: relative;
 
+                            &:first-child {
+                                width: 127px;
+                            }
+
+                            &:nth-child(2) {
+                                width: 210px;
+                            }
+
                             &.sortable {
                                 cursor: pointer;
                                 user-select: none;
