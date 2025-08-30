@@ -1,43 +1,10 @@
 @use "colors" as *;
 
-// Utility classes
-.text-success {
-    color: $brand-500 !important;
-}
 
 .icon-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.breadcrumb-list {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: 0.5rem;
-
-    .breadcrumb-item {
-        display: flex;
-        align-items: center;
-
-        &:not(:last-child)::after {
-            content: '›';
-            margin-left: 0.5rem;
-            color: $gray-500;
-        }
-
-        .breadcrumb-link {
-            color: $gray-600;
-            text-decoration: none;
-
-            &:hover {
-                color: $color-text;
-                text-decoration: underline;
-            }
-        }
-    }
 }
 
 .hidden {

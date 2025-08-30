@@ -127,71 +127,6 @@ function _parseCSVLine(line) {
 }
 
 /**
- * Create file download
- */
-function downloadFile(content, filename, contentType = 'text/plain') {
-  const blob = new Blob([content], { type: contentType });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.style.display = 'none';
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  // Clean up the URL object
-  setTimeout(() => URL.revokeObjectURL(url), 100);
-}
-
-/**
- * Upload file with progress tracking
- */
-async function uploadFileWithProgress(file, uploadUrl, onProgress = null) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    const formData = new FormData();
-    formData.append('file', file);
-
-    // Track upload progress
-    if (onProgress) {
-      xhr.upload.addEventListener('progress', (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = (event.loaded / event.total) * 100;
-          onProgress(percentComplete);
-        }
-      });
-    }
-
-    xhr.addEventListener('load', () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const response = JSON.parse(xhr.responseText);
-          resolve(response);
-        } catch (error) {
-          resolve({ success: true, message: 'File uploaded successfully' });
-        }
-      } else {
-        reject(new Error(`Upload failed with status ${xhr.status}`));
-      }
-    });
-
-    xhr.addEventListener('error', () => {
-      reject(new Error('Upload failed due to network error'));
-    });
-
-    xhr.addEventListener('abort', () => {
-      reject(new Error('Upload was aborted'));
-    });
-
-    xhr.open('POST', uploadUrl);
-    xhr.send(formData);
-  });
-}
-
-/**
  * Create a file preview for supported file types
  */
 async function createFilePreview(file) {
@@ -250,8 +185,6 @@ function _formatFileSize(bytes) {
 export default {
   validateFile,
   readFile,
-  downloadFile,
-  uploadFileWithProgress,
   createFilePreview,
   getFileInfo
 };

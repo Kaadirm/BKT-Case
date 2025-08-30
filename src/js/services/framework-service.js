@@ -12,23 +12,6 @@ export function createFrameworkService(apiInstance = null) {
     },
 
     /**
-     * Get framework by ID with full details
-     */
-    async getFrameworkDetails(id) {
-      try {
-        const framework = await api.getFrameworkById(id);
-        const controls = await api.getControlsbyFrameworkId(id);
-        return {
-          ...framework,
-          controls,
-          controlCount: controls.length
-        };
-      } catch (error) {
-        throw new Error(`Failed to load framework details: ${error.message}`);
-      }
-    },
-
-    /**
      * Create a new framework
      */
     async createFramework(frameworkData) {

@@ -320,13 +320,6 @@ const getStepper = (element) => {
   };
 };
 
-const destroyStepperInstance = (element) => {
-  const state = getStepperState(element);
-  if (state) {
-    destroyStepper(state);
-  }
-};
-
 // Global control system
 const wireGlobalControls = () => {
   if (document.__stepperControlsWired) return;
@@ -387,35 +380,5 @@ wireGlobalControls();
 // Export public API
 export {
   createStepper,
-  getStepper,
-  destroyStepperInstance,
-  wireGlobalControls,
-  clearValidationErrors,
-  showValidationErrors
+  getStepper
 };
-
-// Legacy class export for backward compatibility (optional)
-export class Stepper {
-  constructor(element, options = {}) {
-    const instance = createStepper(element, options);
-    // Copy methods to this instance
-    Object.assign(this, instance);
-    this.root = element;
-  }
-
-  static createInstance(element, options = {}) {
-    return createStepper(element, options);
-  }
-
-  static getInstance(element) {
-    return getStepper(element);
-  }
-
-  static destroyInstance(element) {
-    destroyStepperInstance(element);
-  }
-
-  static wireGlobalControls() {
-    wireGlobalControls();
-  }
-}
