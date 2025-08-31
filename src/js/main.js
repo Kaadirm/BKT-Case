@@ -73,16 +73,22 @@ async function loadFrameworks(options = {}) {
     const items = await frameworkService.getFrameworks();
 
     // Clear skeleton items and render actual frameworks
-    listEl.innerHTML = '';
+    listEl.textContent = '';
     for (const item of items) {
       listEl.appendChild(renderFrameworkItem(item));
     }
     if (items.length === 0) {
-      listEl.innerHTML = '<li class="list-empty">No frameworks found</li>';
+      const li = document.createElement('li');
+      li.className = 'list-empty';
+      li.textContent = 'No frameworks found';
+      listEl.appendChild(li);
     }
   } catch (err) {
     if (err && err.name === 'AbortError') return;
-    listEl.innerHTML = `<li class="list-error">Failed to load frameworks: ${err.message}</li>`;
+    const li = document.createElement('li');
+    li.className = 'list-error';
+    li.textContent = `Failed to load frameworks: ${UtilityService.sanitizeHtml(err.message)}`;
+    listEl.appendChild(li);
   }
 }
 
@@ -144,7 +150,13 @@ async function openFramework(id) {
       // Create loading overlay
       const loadingOverlay = document.createElement('div');
       loadingOverlay.className = 'loading-overlay';
-      loadingOverlay.innerHTML = '<div class="loading"><div class="spinner" aria-label="Loading"></div></div>';
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'loading';
+      const spinnerDiv = document.createElement('div');
+      spinnerDiv.className = 'spinner';
+      spinnerDiv.setAttribute('aria-label', 'Loading');
+      loadingDiv.appendChild(spinnerDiv);
+      loadingOverlay.appendChild(loadingDiv);
 
       // Ensure table card has relative positioning
       tableCard.style.position = 'relative';
@@ -275,12 +287,21 @@ async function openFramework(id) {
     if (err && err.name === 'AbortError') return; // ignore aborted request
     // On error, hide the table and show empty with error message
     tableCardBody.classList.add('hidden');
-    tableContainer.innerHTML = '';
+    tableContainer.textContent = '';
     tableContainer.style.display = 'none';
     if (tableHost) {
       tableHost.style.display = 'block';
       tableHost.classList.remove('hidden');
-      tableHost.innerHTML = `<div class="empty-list-content"><div class="empty-list-icon"></div><p class="empty-list-text">Failed to load data: ${UtilityService.sanitizeHtml(err.message)}</p></div>`;
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'empty-list-content';
+      const iconDiv = document.createElement('div');
+      iconDiv.className = 'empty-list-icon';
+      const p = document.createElement('p');
+      p.className = 'empty-list-text';
+      p.textContent = `Failed to load data: ${UtilityService.sanitizeHtml(err.message)}`;
+      emptyDiv.appendChild(iconDiv);
+      emptyDiv.appendChild(p);
+      tableHost.appendChild(emptyDiv);
     }
     currentLoadingController = null;
   }
@@ -553,7 +574,7 @@ function resetFrameworkForm() {
   }
 
   const tableBody = document.querySelector('#newFwItemsTable tbody');
-  if (tableBody) tableBody.innerHTML = '';
+  if (tableBody) tableBody.textContent = '';
 
   // Clear file input and filename display
   if (templateFile) templateFile.value = '';
@@ -589,7 +610,7 @@ function resetFrameworkForm() {
 // =============================================================================
 
 function showSkeletonLoading(count = DEFAULT_SKELETON_COUNT) {
-  listEl.innerHTML = '';
+  listEl.textContent = '';
   for (let i = 0; i < count; i++) {
     listEl.appendChild(renderSkeletonItem());
   }
@@ -646,7 +667,7 @@ function clearInputError(input) {
 
 function setModalFunctionalActions(buttons = []) {
   if (!modalFunctionalActions) return;
-  modalFunctionalActions.innerHTML = '';
+  modalFunctionalActions.textContent = '';
   buttons.forEach(cfg => {
     const btn = document.createElement('button');
     btn.type = 'button';

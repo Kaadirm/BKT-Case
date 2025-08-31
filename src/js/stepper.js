@@ -184,7 +184,7 @@ const updateNavigation = (element, current, maxSteps, config) => {
     // Show next only when not on last step
     btn.style.display = current >= maxSteps ? 'none' : 'inline-flex';
     if (current < maxSteps) {
-      btn.innerHTML = nextLabel ? `Next › ${nextLabel}` : 'Next';
+      btn.textContent = nextLabel ? `Next › ${nextLabel}` : 'Next';
     }
   });
 

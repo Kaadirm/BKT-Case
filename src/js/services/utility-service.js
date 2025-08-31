@@ -20,8 +20,6 @@ export const UtilityService = {
    * Sanitize HTML content
    */
   sanitizeHtml(str) {
-    const temp = document.createElement('div');
-    temp.textContent = str;
-    return temp.innerHTML;
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
   }
 };

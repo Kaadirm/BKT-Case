@@ -27,7 +27,7 @@ export function createSimpleTable(host, { columns, pageSize = 10, tableClass = '
   };
 
   const _build = () => {
-    state.host.innerHTML = '';
+    state.host.textContent = '';
     state.wrapper = document.createElement('div');
     state.wrapper.className = state.wrapperClass;
     state.table = document.createElement('table');
@@ -199,7 +199,7 @@ export function createSimpleTable(host, { columns, pageSize = 10, tableClass = '
     if (state.externalNextBtn) state.externalNextBtn.disabled = state.currentPage === pages || total === 0;
 
     // Pagination controls
-    if (state.pag) state.pag.innerHTML = '';
+    if (state.pag) state.pag.textContent = '';
 
     if (state.pag && total > 0) {
       const makeBtn = (label, disabled, page) => {
