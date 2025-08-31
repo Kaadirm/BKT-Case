@@ -1,0 +1,17 @@
+export const listEl = document.getElementById('frameworkList');
+export const tableHost = document.getElementById('tableHost');
+export const tableContainer = document.getElementById('tableContainer');
+export const tableToolbar = document.getElementById('tableToolbar');
+export const tableCardBody = document.querySelector('.table-card-body');
+export const tableCard = document.querySelector('.table-card');
+export const searchInput = document.getElementById('tableSearch');
+export const pageSizeSelect = document.getElementById('pageSize');
+export const pageInfo = document.getElementById('pageInfo');
+export const noDataState = document.getElementById('noDataState');
+export const frameworkStepper = document.getElementById('frameworkStepper');
+export const frameworkForm = document.getElementById('frameworkForm');
+export const templateFile = document.getElementById('templateFile');
+export const templateFileName = document.getElementById('templateFileName');
+export const newFrameworkModal = document.getElementById('newFrameworkModal');
+export const newFrameworkModalLabel = document.getElementById('newFrameworkModalLabel');
+export const modalFunctionalActions = document.getElementById('modalFunctionalActions');

@@ -6,34 +6,8 @@ import { ControlItemService } from './services/control-item-service.js';
 import { UtilityService } from './services/utility-service.js';
 import { renderFrameworkItem, renderSkeletonItem } from './renderers.js';
 
-// =============================================================================
-// CONSTANTS AND CONFIGURATION
-// =============================================================================
-
-const API_BASE_URL = 'https://bk-backend.vercel.app/api/v1';
-const DEFAULT_SKELETON_COUNT = 8;
-
-// =============================================================================
-// DOM ELEMENTS
-// =============================================================================
-
-const listEl = document.getElementById('frameworkList');
-const tableHost = document.getElementById('tableHost');
-const tableContainer = document.getElementById('tableContainer');
-const tableToolbar = document.getElementById('tableToolbar');
-const tableCardBody = document.querySelector('.table-card-body');
-const tableCard = document.querySelector('.table-card');
-const searchInput = document.getElementById('tableSearch');
-const pageSizeSelect = document.getElementById('pageSize');
-const pageInfo = document.getElementById('pageInfo');
-const noDataState = document.getElementById('noDataState');
-const frameworkStepper = document.getElementById('frameworkStepper');
-const frameworkForm = document.getElementById('frameworkForm');
-const templateFile = document.getElementById('templateFile');
-const templateFileName = document.getElementById('templateFileName');
-const newFrameworkModal = document.getElementById('newFrameworkModal');
-const newFrameworkModalLabel = document.getElementById('newFrameworkModalLabel');
-const modalFunctionalActions = document.getElementById('modalFunctionalActions');
+import { API_BASE_URL, DEFAULT_SKELETON_COUNT } from './config/constants.js';
+import { listEl, tableHost, tableContainer, tableToolbar, tableCardBody, tableCard, searchInput, pageSizeSelect, pageInfo, noDataState, frameworkStepper, frameworkForm, templateFile, templateFileName, newFrameworkModal, newFrameworkModalLabel, modalFunctionalActions } from './config/domElements.js';
 
 // =============================================================================
 // GLOBAL STATE
