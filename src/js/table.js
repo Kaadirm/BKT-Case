@@ -156,7 +156,9 @@ export function createSimpleTable(host, { columns, pageSize = 10, tableClass = '
     const pageRows = state.filtered.slice(start, start + state.pageSize);
 
     // Render rows
-    state.tbody.innerHTML = '';
+    while (state.tbody.firstChild) {
+      state.tbody.removeChild(state.tbody.firstChild);
+    }
     if (pageRows.length === 0) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
@@ -173,7 +175,12 @@ export function createSimpleTable(host, { columns, pageSize = 10, tableClass = '
 
           if (col.render && typeof col.render === 'function') {
             // Use custom render function for this column
-            td.innerHTML = col.render(row[col.key], row);
+            const result = col.render(row[col.key], row);
+            if (result instanceof Node) {
+              td.appendChild(result);
+            } else {
+              td.textContent = result;
+            }
           } else {
             // Default text rendering
             td.textContent = row[col.key] ?? '';

@@ -60,6 +60,13 @@
     background-image: url('/public/icons/close.svg');
 }
 
+.plus-icon {
+    @extend .icon;
+    width: 12px;
+    height: 12px;
+    background-image: url('/public/icons/plus.svg');
+}
+
 // Action icons for table buttons
 .action-icon {
     @extend .icon;

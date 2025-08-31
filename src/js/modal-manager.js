@@ -116,11 +116,44 @@ export function ModalManager({
                     { key: 'controlDescription', label: 'Control Description', sortable: false },
                     {
                         key: '__actions', label: 'Actions', sortable: false, render: (_v, row) => {
+                            const div = document.createElement('div');
+                            div.className = 'cell-actions text-end';
                             const showEdit = (row.showEdit === false) ? false : !row.approved;
-                            const editBtn = showEdit ? `\n            <button type="button" title="Edit" aria-label="Edit ${row.controlId}"\n              class="btn-action edit">\n              <span class="edit-icon" aria-hidden="true"></span>\n            </button>` : '';
-                            const approveBtn = row.approved ? `\n            <button type="button" title="Approved" aria-label="Approved ${row.controlId}"\n              class="btn-action approve">\n              <span class="approved-icon" aria-hidden="true"></span>\n            </button>` : '';
-                            const deleteBtn = `\n            <button type="button" title="Delete" aria-label="Delete ${row.controlId}"\n              class="btn-action delete">\n              <span class="delete-icon" aria-hidden="true"></span>\n            </button>`;
-                            return `<div class="cell-actions text-end">${editBtn}${approveBtn}${deleteBtn}</div>`;
+                            if (showEdit) {
+                                const editBtn = document.createElement('button');
+                                editBtn.type = 'button';
+                                editBtn.title = 'Edit';
+                                editBtn.setAttribute('aria-label', `Edit ${row.controlId}`);
+                                editBtn.className = 'btn-action edit';
+                                const editSpan = document.createElement('span');
+                                editSpan.className = 'edit-icon';
+                                editSpan.setAttribute('aria-hidden', 'true');
+                                editBtn.appendChild(editSpan);
+                                div.appendChild(editBtn);
+                            }
+                            if (row.approved) {
+                                const approveBtn = document.createElement('button');
+                                approveBtn.type = 'button';
+                                approveBtn.title = 'Approved';
+                                approveBtn.setAttribute('aria-label', `Approved ${row.controlId}`);
+                                approveBtn.className = 'btn-action approve';
+                                const approveSpan = document.createElement('span');
+                                approveSpan.className = 'approved-icon';
+                                approveSpan.setAttribute('aria-hidden', 'true');
+                                approveBtn.appendChild(approveSpan);
+                                div.appendChild(approveBtn);
+                            }
+                            const deleteBtn = document.createElement('button');
+                            deleteBtn.type = 'button';
+                            deleteBtn.title = 'Delete';
+                            deleteBtn.setAttribute('aria-label', `Delete ${row.controlId}`);
+                            deleteBtn.className = 'btn-action delete';
+                            const deleteSpan = document.createElement('span');
+                            deleteSpan.className = 'delete-icon';
+                            deleteSpan.setAttribute('aria-hidden', 'true');
+                            deleteBtn.appendChild(deleteSpan);
+                            div.appendChild(deleteBtn);
+                            return div;
                         }
                     }
                 ],
@@ -187,7 +220,33 @@ export function ModalManager({
         const step2HostTable = document.getElementById('newFwItemsTable');
         const step2Host = step2HostTable ? step2HostTable.parentElement : null;
         if (step2Host) {
-            step2Host.innerHTML = `\n      <table class="custom-table" id="newFwItemsTable">\n        <thead>\n          <tr>\n            <th style="width: 160px;">Control ID</th>\n            <th style="width: 240px;">Control Category</th>\n            <th>Control Description</th>\n            <th class="text-end" style="width: 100px;">Actions</th>\n          </tr>\n        </thead>\n        <tbody></tbody>\n      </table>`;
+            step2Host.textContent = '';
+            const table = document.createElement('table');
+            table.className = 'custom-table';
+            table.id = 'newFwItemsTable';
+            const thead = document.createElement('thead');
+            const tr = document.createElement('tr');
+            const th1 = document.createElement('th');
+            th1.style.width = '160px';
+            th1.textContent = 'Control ID';
+            const th2 = document.createElement('th');
+            th2.style.width = '240px';
+            th2.textContent = 'Control Category';
+            const th3 = document.createElement('th');
+            th3.textContent = 'Control Description';
+            const th4 = document.createElement('th');
+            th4.className = 'text-end';
+            th4.style.width = '100px';
+            th4.textContent = 'Actions';
+            tr.appendChild(th1);
+            tr.appendChild(th2);
+            tr.appendChild(th3);
+            tr.appendChild(th4);
+            thead.appendChild(tr);
+            const tbody = document.createElement('tbody');
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            step2Host.appendChild(table);
         }
     }
 

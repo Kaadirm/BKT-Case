@@ -72,14 +72,14 @@ export function setModalFunctionalActions(buttons = []) {
     btn.type = 'button';
     btn.id = cfg.id || '';
     btn.className = 'btn btn-functional';
-    btn.innerHTML = `
-      <span class="icon" aria-hidden="true">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/>
-        </svg>
-      </span>
-      <span class="label">${UtilityService.sanitizeHtml(cfg.label || 'Action')}</span>
-    `;
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'icon plus-icon';
+    iconSpan.setAttribute('aria-hidden', 'true');
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'label';
+    labelSpan.textContent = cfg.label || 'Action';
+    btn.appendChild(iconSpan);
+    btn.appendChild(labelSpan);
     if (typeof cfg.onClick === 'function') {
       btn.addEventListener('click', cfg.onClick);
     }
