@@ -1,7 +1,7 @@
 import { createStepper, getStepper } from './stepper.js';
 import { createSimpleTable } from './table.js';
 import { createApi } from './services/api.js';
-import { createFrameworkService } from './services/framework-service.js';
+import { FrameworkService } from './services/framework-service.js';
 import { ControlItemService } from './services/control-item-service.js';
 import fileUploadService from './services/file-upload-service.js';
 import { UtilityService } from './services/utility-service.js';
@@ -9,7 +9,7 @@ import { renderFrameworkItem, renderSkeletonItem } from './renderers.js';
 
 // Initialize services
 const api = createApi({ serviceBase: 'https://bk-backend.vercel.app/api/v1' });
-const frameworkService = createFrameworkService(api);
+const frameworkService = FrameworkService(api);
 const controlItemService = ControlItemService(api);
 
 // Framework list + table init
@@ -617,32 +617,7 @@ function updateControlItemsStep() {
 
 ensureStepperInstance();
 
-// Save handler - creates framework with all data
-const saveBtn = document.getElementById('saveFrameworkBtn');
-if (saveBtn) {
-  saveBtn.addEventListener('click', async () => {
-    // Validate framework data
-    if (!currentFrameworkData.name?.trim()) {
-      return;
-    }
-
-    if (!currentFrameworkData.shortName?.trim()) {
-      return;
-    }
-
-    // Create framework
-    const result = await frameworkService.createFramework(currentFrameworkData);
-
-    // Refresh list after create
-    await loadFrameworks();
-
-    // Close modal
-    closeNewFrameworkModal();
-
-    // Reset form
-    resetFrameworkForm();
-  });
-}
+// Save handler - removed create framework functionality
 
 function resetFrameworkForm() {
   const form = document.getElementById('frameworkForm');

@@ -41,34 +41,9 @@ export function createApi({ serviceBase = '/api' } = {}) {
     return Array.isArray(controls) ? controls : (controls.data || controls.items || []);
   };
 
-  const createFramework = async (payload) => {
-    const url = `${serviceBase}/frameworks`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  };
-
-  const uploadFrameworkTemplate = async (file) => {
-    const url = `${serviceBase}/frameworks/upload-template`;
-    const formData = new FormData();
-    formData.append('template', file);
-    const res = await fetch(url, {
-      method: 'POST',
-      body: formData
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  };
-
   return {
     abort,
     getFrameworks,
-    getControlsbyFrameworkId,
-    createFramework,
-    uploadFrameworkTemplate
+    getControlsbyFrameworkId
   };
 }
