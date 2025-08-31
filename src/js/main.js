@@ -6,12 +6,17 @@ import { ControlItemService } from './services/control-item-service.js';
 import { UtilityService } from './services/utility-service.js';
 import { renderFrameworkItem, renderSkeletonItem } from './renderers.js';
 
-// Initialize services
-const api = createApi({ serviceBase: 'https://bk-backend.vercel.app/api/v1' });
-const frameworkService = FrameworkService(api);
-const controlItemService = ControlItemService(api);
+// =============================================================================
+// CONSTANTS AND CONFIGURATION
+// =============================================================================
 
-// Framework list + table init
+const API_BASE_URL = 'https://bk-backend.vercel.app/api/v1';
+const DEFAULT_SKELETON_COUNT = 8;
+
+// =============================================================================
+// DOM ELEMENTS
+// =============================================================================
+
 const listEl = document.getElementById('frameworkList');
 const tableHost = document.getElementById('tableHost');
 const tableContainer = document.getElementById('tableContainer');
@@ -21,33 +26,41 @@ const tableCard = document.querySelector('.table-card');
 const searchInput = document.getElementById('tableSearch');
 const pageSizeSelect = document.getElementById('pageSize');
 const pageInfo = document.getElementById('pageInfo');
+const noDataState = document.getElementById('noDataState');
+const frameworkStepper = document.getElementById('frameworkStepper');
+const frameworkForm = document.getElementById('frameworkForm');
+const templateFile = document.getElementById('templateFile');
+const templateFileName = document.getElementById('templateFileName');
+const newFrameworkModal = document.getElementById('newFrameworkModal');
+const newFrameworkModalLabel = document.getElementById('newFrameworkModalLabel');
+const modalFunctionalActions = document.getElementById('modalFunctionalActions');
+
+// =============================================================================
+// GLOBAL STATE
+// =============================================================================
 
 let table;
 let currentFrameworkId = null;
 let currentLoadingController = null;
 let currentFrameworksController = null;
+let currentFrameworkData = {};
+let modalControlsTable = null; // step-2 simple table instance
+
+// =============================================================================
+// INITIALIZATION
+// =============================================================================
+
+// Initialize services
+const api = createApi({ serviceBase: API_BASE_URL });
+const frameworkService = FrameworkService(api);
+const controlItemService = ControlItemService(api);
 
 // Show skeleton loading immediately when script loads
-showSkeletonLoading(8);
+showSkeletonLoading(DEFAULT_SKELETON_COUNT);
 
-// Global page size handler setup
-function setupPageSizeHandler() {
-  if (pageSizeSelect && !pageSizeSelect.hasAttribute('data-global-handler')) {
-    pageSizeSelect.addEventListener('change', (e) => {
-      if (table) {
-        table.setPageSize(parseInt(e.target.value, 10));
-      }
-    });
-    pageSizeSelect.setAttribute('data-global-handler', 'true');
-  }
-}
-
-function showSkeletonLoading(count = 5) {
-  listEl.innerHTML = '';
-  for (let i = 0; i < count; i++) {
-    listEl.appendChild(renderSkeletonItem());
-  }
-}
+// =============================================================================
+// FRAMEWORK MANAGEMENT
+// =============================================================================
 
 async function loadFrameworks(options = {}) {
   try {
@@ -79,9 +92,6 @@ function activateItem(id) {
 
 async function openFramework(id) {
   try {
-    // Get DOM elements once at the beginning
-    const noDataState = document.getElementById('noDataState');
-
     // Abort any previous loading operation
     if (currentLoadingController) {
       currentLoadingController.abort();
@@ -276,7 +286,10 @@ async function openFramework(id) {
   }
 }
 
-// --- Client-side routing ---
+// =============================================================================
+// ROUTING
+// =============================================================================
+
 function getRouteFrameworkId() {
   const path = window.location.pathname || '';
   const match = path.match(/\/framework\/([^\/?#]+)/);
@@ -292,7 +305,6 @@ function navigateToFramework(id, { replace = false } = {}) {
   openFramework(id);
 }
 
-// Keep page header and breadcrumb in sync with current selection
 function updatePageHeader(selectedName = null) {
   const titleEl = document.querySelector('.info-title');
   if (titleEl) {
@@ -316,70 +328,18 @@ function updatePageHeader(selectedName = null) {
   }
 }
 
-// Click handlers for framework list
-listEl.addEventListener('click', (e) => {
-  const link = e.target.closest('.framework-item');
-  if (!link) return;
-  e.preventDefault();
-  const id = link.dataset.id;
-  if (!id) return;
-  navigateToFramework(id);
-});
-
-listEl.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    const item = e.target.closest('.framework-item');
-    if (item) {
-      e.preventDefault();
-      navigateToFramework(item.dataset.id);
-    }
-  }
-});
-
-window.addEventListener('popstate', () => {
-  const id = getRouteFrameworkId();
-  if (id) {
-    openFramework(id);
-  } else {
-    // No framework selected - reset to initial state
-    currentFrameworkId = null;
-    updatePageHeader(null);
-
-    // Hide table and show "select framework" state
-    const noDataState = document.getElementById('noDataState');
-    if (tableCardBody) tableCardBody.classList.add('hidden');
-    if (tableContainer) tableContainer.style.display = 'none';
-    if (tableToolbar) tableToolbar.classList.add('hidden');
-
-    // Show the initial "select framework" state
-    if (tableHost) {
-      tableHost.style.display = 'block';
-      tableHost.classList.remove('hidden');
-    }
-    // Hide the "no data" state
-    if (noDataState) {
-      noDataState.style.display = 'none';
-      noDataState.classList.add('hidden');
-    }
-
-    // Clear active framework selection
-    listEl.querySelectorAll('.framework-item').forEach(el => el.classList.remove('active'));
-  }
-});
-
-// Modal stepper wiring - using functional approach
-let currentFrameworkData = {};
-let modalControlsTable = null; // step-2 simple table instance
+// =============================================================================
+// MODAL MANAGEMENT
+// =============================================================================
 
 function ensureStepperInstance() {
-  const stepperRoot = document.getElementById('frameworkStepper');
-  if (!stepperRoot) return null;
+  if (!frameworkStepper) return null;
 
   // Check if stepper already exists
-  let stepper = getStepper(stepperRoot);
+  let stepper = getStepper(frameworkStepper);
   if (!stepper) {
     // Create new stepper with functional approach
-    stepper = createStepper(stepperRoot, {
+    stepper = createStepper(frameworkStepper, {
       onChange: (from, to) => {
         updateModalTitle(to);
         updateModalButtons(to);
@@ -410,9 +370,7 @@ function ensureStepperInstance() {
 }
 
 function updateModalTitle(step) {
-  const modalTitle = document.getElementById('newFrameworkModalLabel');
-  const stepIndicator = modalTitle?.querySelector('.step-indicator');
-
+  const stepIndicator = newFrameworkModalLabel?.querySelector('.step-indicator');
   if (stepIndicator) {
     stepIndicator.textContent = `${step}/2`;
   }
@@ -421,13 +379,12 @@ function updateModalTitle(step) {
 function updateModalButtons(step) { /* managed by stepper.js updateNavigation */ }
 
 function validateFrameworkDetails() {
-  const form = document.getElementById('frameworkForm');
-  if (!form) return true;
+  if (!frameworkForm) return true;
 
-  const isValid = form.checkValidity();
+  const isValid = frameworkForm.checkValidity();
   if (!isValid) {
     // Show validation errors
-    const invalidInputs = form.querySelectorAll(':invalid');
+    const invalidInputs = frameworkForm.querySelectorAll(':invalid');
     invalidInputs.forEach(input => {
       input.classList.add('invalid');
       const errorEl = input.parentElement.querySelector('.form-error');
@@ -448,9 +405,8 @@ function validateControlItems() {
 function saveCurrentStepData(step) {
   switch (step) {
     case 1: // Framework Details
-      const form = document.getElementById('frameworkForm');
-      if (form) {
-        const formData = new FormData(form);
+      if (frameworkForm) {
+        const formData = new FormData(frameworkForm);
         currentFrameworkData = {
           ...currentFrameworkData,
           name: formData.get('name'),
@@ -481,19 +437,13 @@ function updateStepContent(stepIndex) {
 
 function updateFrameworkDetailsStep() {
   // Setup file upload handler
-  const fileInput = document.getElementById('templateFile');
+  if (templateFile && !templateFile.dataset.initialized) {
+    templateFile.dataset.initialized = 'true';
 
-  if (fileInput && !fileInput.dataset.initialized) {
-    fileInput.dataset.initialized = 'true';
-
-    fileInput.addEventListener('change', (e) => {
+    templateFile.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      const fileNameSpan = document.getElementById('templateFileName');
-
-      if (file) {
-        fileNameSpan.textContent = file.name;
-      } else {
-        fileNameSpan.textContent = '';
+      if (templateFileName) {
+        templateFileName.textContent = file ? file.name : '';
       }
     });
   }
@@ -588,16 +538,11 @@ function updateControlItemsStep() {
   }
 }
 
-ensureStepperInstance();
-
-// Save handler - removed create framework functionality
-
 function resetFrameworkForm() {
-  const form = document.getElementById('frameworkForm');
-  if (form) {
-    form.reset();
+  if (frameworkForm) {
+    frameworkForm.reset();
     // Clear validation errors
-    const invalidInputs = form.querySelectorAll('.invalid');
+    const invalidInputs = frameworkForm.querySelectorAll('.invalid');
     invalidInputs.forEach(input => {
       input.classList.remove('invalid');
       const errorEl = input.parentElement.querySelector('.form-error');
@@ -611,10 +556,8 @@ function resetFrameworkForm() {
   if (tableBody) tableBody.innerHTML = '';
 
   // Clear file input and filename display
-  const fileInput = document.getElementById('templateFile');
-  if (fileInput) fileInput.value = '';
-  const fileNameSpan = document.getElementById('templateFileName');
-  if (fileNameSpan) fileNameSpan.textContent = '';
+  if (templateFile) templateFile.value = '';
+  if (templateFileName) templateFileName.textContent = '';
 
   currentFrameworkData = {};
   // uploadedTemplate = null;
@@ -641,12 +584,145 @@ function resetFrameworkForm() {
   // Reset stepper to first step will be handled by openModal function
 }
 
-// Search functionality
-// Framework search/status removed: filtering belongs to controls only.
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
 
-// Add refresh button functionality
+function showSkeletonLoading(count = DEFAULT_SKELETON_COUNT) {
+  listEl.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    listEl.appendChild(renderSkeletonItem());
+  }
+}
 
-// Initialize keyboard shortcuts
+function setupPageSizeHandler() {
+  if (pageSizeSelect && !pageSizeSelect.hasAttribute('data-global-handler')) {
+    pageSizeSelect.addEventListener('change', (e) => {
+      if (table) {
+        table.setPageSize(parseInt(e.target.value, 10));
+      }
+    });
+    pageSizeSelect.setAttribute('data-global-handler', 'true');
+  }
+}
+
+function setupFormValidationClearing() {
+  if (!frameworkForm) return;
+
+  // Clear validation errors when user starts typing in text inputs and textareas
+  const textInputs = frameworkForm.querySelectorAll('input[type="text"], input:not([type]), textarea');
+  textInputs.forEach(input => {
+    // Remove any existing listeners to prevent duplicates
+    input.removeEventListener('input', clearInputErrorHandler);
+    input.addEventListener('input', clearInputErrorHandler);
+  });
+
+  // Clear validation errors when user selects a file
+  const fileInput = frameworkForm.querySelector('input[type="file"]');
+  if (fileInput) {
+    fileInput.removeEventListener('change', clearInputErrorHandler);
+    fileInput.addEventListener('change', clearInputErrorHandler);
+  }
+
+  // Clear validation errors when user checks/unchecks checkboxes
+  const checkboxes = frameworkForm.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.removeEventListener('change', clearInputErrorHandler);
+    checkbox.addEventListener('change', clearInputErrorHandler);
+  });
+}
+
+function clearInputErrorHandler(event) {
+  clearInputError(event.target);
+}
+
+function clearInputError(input) {
+  input.classList.remove('invalid');
+  const errorEl = input.parentElement.querySelector('.form-error');
+  if (errorEl) {
+    errorEl.classList.remove('visible');
+  }
+}
+
+function setModalFunctionalActions(buttons = []) {
+  if (!modalFunctionalActions) return;
+  modalFunctionalActions.innerHTML = '';
+  buttons.forEach(cfg => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = cfg.id || '';
+    btn.className = 'btn btn-functional';
+    btn.innerHTML = `
+      <span class="icon" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/>
+        </svg>
+      </span>
+      <span class="label">${UtilityService.sanitizeHtml(cfg.label || 'Action')}</span>
+    `;
+    if (typeof cfg.onClick === 'function') {
+      btn.addEventListener('click', cfg.onClick);
+    }
+    modalFunctionalActions.appendChild(btn);
+  });
+}
+
+// =============================================================================
+// EVENT HANDLERS
+// =============================================================================
+
+// Framework list event handlers
+listEl.addEventListener('click', (e) => {
+  const link = e.target.closest('.framework-item');
+  if (!link) return;
+  e.preventDefault();
+  const id = link.dataset.id;
+  if (!id) return;
+  navigateToFramework(id);
+});
+
+listEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    const item = e.target.closest('.framework-item');
+    if (item) {
+      e.preventDefault();
+      navigateToFramework(item.dataset.id);
+    }
+  }
+});
+
+// Browser navigation
+window.addEventListener('popstate', () => {
+  const id = getRouteFrameworkId();
+  if (id) {
+    openFramework(id);
+  } else {
+    // No framework selected - reset to initial state
+    currentFrameworkId = null;
+    updatePageHeader(null);
+
+    // Hide table and show "select framework" state
+    if (tableCardBody) tableCardBody.classList.add('hidden');
+    if (tableContainer) tableContainer.style.display = 'none';
+    if (tableToolbar) tableToolbar.classList.add('hidden');
+
+    // Show the initial "select framework" state
+    if (tableHost) {
+      tableHost.style.display = 'block';
+      tableHost.classList.remove('hidden');
+    }
+    // Hide the "no data" state
+    if (noDataState) {
+      noDataState.style.display = 'none';
+      noDataState.classList.add('hidden');
+    }
+
+    // Clear active framework selection
+    listEl.querySelectorAll('.framework-item').forEach(el => el.classList.remove('active'));
+  }
+});
+
+// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   // Ctrl/Cmd + K for search
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -670,9 +746,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Initialize tooltips
-
-// Error handling for uncaught errors
+// Error handling
 window.addEventListener('error', (e) => {
   console.error('Uncaught error:', e.error);
 });
@@ -681,59 +755,69 @@ window.addEventListener('unhandledrejection', (e) => {
   console.error('Unhandled promise rejection:', e.reason);
 });
 
-// Setup form validation error clearing
-function setupFormValidationClearing() {
-  const form = document.getElementById('frameworkForm');
-  if (!form) return;
+// =============================================================================
+// MODAL FUNCTIONS (EXPOSED GLOBALLY)
+// =============================================================================
 
-  // Clear validation errors when user starts typing in text inputs and textareas
-  const textInputs = form.querySelectorAll('input[type="text"], input:not([type]), textarea');
-  textInputs.forEach(input => {
-    // Remove any existing listeners to prevent duplicates
-    input.removeEventListener('input', clearInputErrorHandler);
-    input.addEventListener('input', clearInputErrorHandler);
-  });
+window.openNewFrameworkModal = function () {
+  if (!newFrameworkModal) return;
+  newFrameworkModal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
 
-  // Clear validation errors when user selects a file
-  const fileInput = form.querySelector('input[type="file"]');
-  if (fileInput) {
-    fileInput.removeEventListener('change', clearInputErrorHandler);
-    fileInput.addEventListener('change', clearInputErrorHandler);
+  // Reset form and data
+  resetFrameworkForm();
+
+  // Clear validation errors
+  if (frameworkForm) {
+    // Re-setup form validation clearing after reset
+    setupFormValidationClearing();
   }
 
-  // Clear validation errors when user checks/unchecks checkboxes
-  const checkboxes = form.querySelectorAll('input[type="checkbox"]');
-  checkboxes.forEach(checkbox => {
-    checkbox.removeEventListener('change', clearInputErrorHandler);
-    checkbox.addEventListener('change', clearInputErrorHandler);
-  });
-}
-
-// Event handler function to clear input error
-function clearInputErrorHandler(event) {
-  clearInputError(event.target);
-}
-
-// Helper function to clear individual input error
-function clearInputError(input) {
-  input.classList.remove('invalid');
-  const errorEl = input.parentElement.querySelector('.form-error');
-  if (errorEl) {
-    errorEl.classList.remove('visible');
+  // Initialize stepper
+  const stepper = ensureStepperInstance();
+  if (stepper) {
+    stepper.reset(); // Go to step 1
   }
-}
 
-// Initialize the application
+  // Optionally set functional actions here if needed
+
+  // Focus first input
+  setTimeout(() => {
+    const firstInput = newFrameworkModal.querySelector('input[name="name"]');
+    if (firstInput) {
+      firstInput.focus();
+    }
+  }, 100);
+};
+
+window.closeNewFrameworkModal = function () {
+  if (!newFrameworkModal) return;
+  newFrameworkModal.style.display = 'none';
+  document.body.style.overflow = '';
+
+  // Reset stepper and data
+  const stepper = getStepper(frameworkStepper);
+  if (stepper) {
+    stepper.reset();
+  }
+  resetFrameworkForm();
+};
+
+// Expose for extensibility
+window.setModalFunctionalActions = setModalFunctionalActions;
+
+// =============================================================================
+// APPLICATION INITIALIZATION
+// =============================================================================
+
 async function initializeApp() {
   // Setup global handlers
   setupPageSizeHandler();
   setupFormValidationClearing();
 
-  const templateInput = document.getElementById('templateFile');
-  const templateFileName = document.getElementById('templateFileName');
-  if (templateInput && templateFileName) {
-    templateInput.addEventListener('change', function () {
-      templateFileName.textContent = templateInput.files && templateInput.files.length > 0 ? templateInput.files[0].name : 'No file chosen';
+  if (templateFile && templateFileName) {
+    templateFile.addEventListener('change', function () {
+      templateFileName.textContent = templateFile.files && templateFile.files.length > 0 ? templateFile.files[0].name : 'No file chosen';
     });
   }
 
@@ -746,7 +830,6 @@ async function initializeApp() {
   } else {
     // No framework selected on initial load - ensure correct empty state is shown
     updatePageHeader(null);
-    const noDataState = document.getElementById('noDataState');
 
     // Show the initial "select framework" state
     if (tableHost) {
@@ -764,82 +847,6 @@ async function initializeApp() {
   }
 }
 
-// Custom modal functions
-window.openNewFrameworkModal = function () {
-  const modal = document.getElementById('newFrameworkModal');
-  if (modal) {
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-
-    // Reset form and data
-    resetFrameworkForm();
-
-    // Clear validation errors
-    const form = document.getElementById('frameworkForm');
-    if (form) {
-      // Re-setup form validation clearing after reset
-      setupFormValidationClearing();
-    }
-
-    // Initialize stepper
-    const stepper = ensureStepperInstance();
-    if (stepper) {
-      stepper.reset(); // Go to step 1
-    }
-
-    // Optionally set functional actions here if needed
-
-    // Focus first input
-    setTimeout(() => {
-      const firstInput = modal.querySelector('input[name="name"]');
-      if (firstInput) {
-        firstInput.focus();
-      }
-    }, 100);
-  }
-};
-
-window.closeNewFrameworkModal = function () {
-  const modal = document.getElementById('newFrameworkModal');
-  if (modal) {
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
-
-    // Reset stepper and data
-    const stepper = getStepper(document.getElementById('frameworkStepper'));
-    if (stepper) {
-      stepper.reset();
-    }
-    resetFrameworkForm();
-  }
-};
-
 // Start the application
+ensureStepperInstance();
 initializeApp();
-
-function setModalFunctionalActions(buttons = []) {
-  const container = document.getElementById('modalFunctionalActions');
-  if (!container) return;
-  container.innerHTML = '';
-  buttons.forEach(cfg => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.id = cfg.id || '';
-    btn.className = 'btn btn-functional';
-    btn.innerHTML = `
-      <span class="icon" aria-hidden="true">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/>
-        </svg>
-      </span>
-      <span class="label">${UtilityService.sanitizeHtml(cfg.label || 'Action')}</span>
-    `;
-    if (typeof cfg.onClick === 'function') {
-      btn.addEventListener('click', cfg.onClick);
-    }
-    container.appendChild(btn);
-  });
-}
-
-// Expose for extensibility
-window.setModalFunctionalActions = setModalFunctionalActions;
