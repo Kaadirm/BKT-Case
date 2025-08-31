@@ -550,24 +550,23 @@ function updateControlItemsStep() {
         {
           key: '__actions', label: 'Actions', sortable: false, render: (_v, row) => {
             // Visual-only action buttons (no handlers)
-            const baseBtn = 'display:inline-flex;align-items:center;justify-content:center;width:24px;height:19px;border-radius:6px;border:none;cursor:default;';
             const showEdit = (row.showEdit === false) ? false : !row.approved;
             const editBtn = showEdit ? `
             <button type="button" title="Edit" aria-label="Edit ${row.controlId}"
-              style="${baseBtn}background:#9CA3AF;color:#fff;">
+              class="btn-action edit">
               <span class="edit-icon" aria-hidden="true"></span>
             </button>` : '';
             const approveBtn = row.approved ? `
             <button type="button" title="Approved" aria-label="Approved ${row.controlId}"
-              style="${baseBtn}background:#22C55E;color:#fff;">
+              class="btn-action approve">
               <span class="approved-icon" aria-hidden="true"></span>
             </button>` : '';
             const deleteBtn = `
             <button type="button" title="Delete" aria-label="Delete ${row.controlId}"
-              style="${baseBtn}background:#EF4444;color:#fff;">
+              class="btn-action delete">
               <span class="delete-icon" aria-hidden="true"></span>
             </button>`;
-            return `<div class="cell-actions text-end" style="display:flex;gap:8px;justify-content:flex-end;">${editBtn}${approveBtn}${deleteBtn}</div>`;
+            return `<div class="cell-actions text-end">${editBtn}${approveBtn}${deleteBtn}</div>`;
           }
         }
       ],

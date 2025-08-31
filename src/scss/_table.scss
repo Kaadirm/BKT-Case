@@ -406,6 +406,39 @@
                     &:nth-child(2) {
                         width: 210px;
                     }
+
+                    .cell-actions {
+                        display: flex;
+                        gap: 8px;
+                        justify-content: flex-end;
+
+                        .btn-action {
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 24px;
+                            height: 19px;
+                            border-radius: 6px;
+                            border: none;
+                            cursor: pointer;
+                            color: #fff;
+                            padding: 0;
+                            font-size: 16px;
+                            line-height: 1;
+
+                            &.edit {
+                                background: #9CA3AF;
+                            }
+
+                            &.approve {
+                                background: #22C55E;
+                            }
+
+                            &.delete {
+                                background: #EF4444;
+                            }
+                        }
+                    }
                 }
 
                 .no-data {
