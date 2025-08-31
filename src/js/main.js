@@ -137,18 +137,6 @@ async function openFramework(id) {
       // Create loading overlay
       const loadingOverlay = document.createElement('div');
       loadingOverlay.className = 'loading-overlay';
-      loadingOverlay.style.cssText = `
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.9);
-        z-index: 10;
-      `;
       loadingOverlay.innerHTML = '<div class="loading"><div class="spinner" aria-label="Loading"></div></div>';
 
       // Ensure table card has relative positioning
