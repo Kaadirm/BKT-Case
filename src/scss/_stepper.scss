@@ -268,3 +268,39 @@
         }
     }
 }
+
+@media (max-width: 768px) {
+    .stepper {
+        .stepper-head {
+            flex-wrap: wrap;
+            row-gap: 8px;
+
+            &::before {
+                left: 70px;
+                right: 70px;
+                top: 20px;
+            }
+
+            .step-indicator-wrapper {
+                .step-badge {
+                    width: 32px;
+                    height: 32px;
+
+                    &.active::before,
+                    &.completed::before {
+                        width: 26px;
+                        height: 26px;
+                    }
+                }
+
+                .step-label {
+                    font-size: 13px;
+                }
+            }
+        }
+
+        .step {
+            margin-top: 8px;
+        }
+    }
+}

@@ -155,3 +155,12 @@
     line-height: 21px;
     color: $white;
 }
+
+@media (max-width: 576px) {
+    .btn,
+    .btn-success,
+    .btn-outline-secondary,
+    .btn-functional {
+        width: 100%;
+    }
+}

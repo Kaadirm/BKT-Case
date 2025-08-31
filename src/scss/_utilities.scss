@@ -10,3 +10,17 @@
 .hidden {
     display: none !important;
 }
+
+@media (max-width: 576px) {
+    .text-end {
+        text-align: right;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .w-100 {
+        width: 100% !important;
+    }
+}

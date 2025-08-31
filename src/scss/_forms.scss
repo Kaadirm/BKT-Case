@@ -196,3 +196,56 @@
         }
     }
 }
+
+@media (max-width: 992px) {
+    .custom-form {
+        .form-row {
+            flex-direction: column;
+            row-gap: 8px;
+
+            .form-group {
+                padding: 12px;
+
+                .form-input {
+                    font-size: 15px;
+                }
+
+                .custom-file-upload {
+                    .file-upload-wrapper {
+                        flex-wrap: nowrap;
+                    }
+
+                    .file-upload-label {
+                        font-size: 14px;
+                    }
+
+                    .file-upload-filename {
+                        font-size: 14px;
+                        height: 28px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    .custom-form {
+        .form-notice {
+            padding: 12px;
+            height: auto;
+        }
+
+        .form-row {
+            .form-group {
+                padding: 10px;
+
+                .custom-file-upload {
+                    .file-upload-label {
+                        padding: 6px 10px;
+                    }
+                }
+            }
+        }
+    }
+}
