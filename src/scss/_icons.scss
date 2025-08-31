@@ -59,3 +59,26 @@
     height: 20px;
     background-image: url('/public/icons/close.svg');
 }
+
+// Action icons for table buttons
+.action-icon {
+    @extend .icon;
+    width: 24px;
+    height: 19px;
+    display: inline-block;
+}
+
+.edit-icon {
+    @extend .action-icon;
+    background-image: url('/public/icons/edit.svg');
+}
+
+.approved-icon {
+    @extend .action-icon;
+    background-image: url('/public/icons/approved.svg');
+}
+
+.delete-icon {
+    @extend .action-icon;
+    background-image: url('/public/icons/delete.svg');
+}

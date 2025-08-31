@@ -64,11 +64,9 @@ async function loadFrameworks(options = {}) {
 
     // Clear skeleton items and render actual frameworks
     listEl.innerHTML = '';
-
     for (const item of items) {
       listEl.appendChild(renderFrameworkItem(item));
     }
-
     if (items.length === 0) {
       listEl.innerHTML = '<li class="list-empty">No frameworks found</li>';
     }
@@ -387,6 +385,7 @@ window.addEventListener('popstate', () => {
 // Modal stepper wiring - using functional approach
 let currentFrameworkData = {};
 let uploadedTemplate = null;
+let modalControlsTable = null; // step-2 simple table instance
 
 function ensureStepperInstance() {
   const stepperRoot = document.getElementById('frameworkStepper');
@@ -483,15 +482,15 @@ function saveCurrentStepData(step) {
 }
 
 function updateStepContent(stepIndex) {
+  // Steps are 1-based in the stepper
   switch (stepIndex) {
-    case 0: // Framework Details
+    case 1: // Framework Details
       updateFrameworkDetailsStep();
       break;
-    case 1: // Control Items
+    case 2: // Control Items
       updateControlItemsStep();
       break;
-    case 2: // Review
-      updateReviewStep();
+    default:
       break;
   }
 }
@@ -543,92 +542,92 @@ function updateFrameworkDetailsStep() {
 }
 
 function updateControlItemsStep() {
-  // Load existing items or template items
-  const tableBody = document.querySelector('#newFwItemsTable tbody');
-  if (!tableBody) return;
+  // Render a simple controls table (dummy data, no search/sort/pagination/info)
+  // Resolve host container inside Step 2
+  const step2El = document.querySelector('#frameworkStepper .step[data-index="2"]');
+  const host = step2El ? step2El.querySelector('.custom-table-container') : null;
 
-  // Clear existing rows
-  tableBody.innerHTML = '';
+  // Build once; require host only on first build
+  if (!modalControlsTable) {
+    if (!host) return; // cannot mount without a host
 
-  // Add items from template if available
-  if (currentFrameworkData.controlsFromTemplate) {
-    currentFrameworkData.controlsFromTemplate.forEach(item => {
-      addItemToTable(item);
+    // Force external info element to avoid rendering internal footer/pagination
+    const dummyInfo = document.createElement('div');
+
+    modalControlsTable = createSimpleTable(host, {
+      columns: [
+        { key: 'controlId', label: 'Control ID', sortable: false },
+        { key: 'controlCategory', label: 'Control Category', sortable: false },
+        { key: 'controlDescription', label: 'Control Description', sortable: false },
+        {
+          key: '__actions', label: 'Actions', sortable: false, render: (_v, row) => {
+            // Visual-only action buttons (no handlers)
+            const baseBtn = 'display:inline-flex;align-items:center;justify-content:center;width:24px;height:19px;border-radius:6px;border:none;cursor:default;';
+            const showEdit = (row.showEdit === false) ? false : !row.approved;
+            const editBtn = showEdit ? `
+            <button type="button" title="Edit" aria-label="Edit ${row.controlId}"
+              style="${baseBtn}background:#9CA3AF;color:#fff;">
+              <span class="edit-icon" aria-hidden="true"></span>
+            </button>` : '';
+            const approveBtn = row.approved ? `
+            <button type="button" title="Approved" aria-label="Approved ${row.controlId}"
+              style="${baseBtn}background:#22C55E;color:#fff;">
+              <span class="approved-icon" aria-hidden="true"></span>
+            </button>` : '';
+            const deleteBtn = `
+            <button type="button" title="Delete" aria-label="Delete ${row.controlId}"
+              style="${baseBtn}background:#EF4444;color:#fff;">
+              <span class="delete-icon" aria-hidden="true"></span>
+            </button>`;
+            return `<div class="cell-actions text-end" style="display:flex;gap:8px;justify-content:flex-end;">${editBtn}${approveBtn}${deleteBtn}</div>`;
+          }
+        }
+      ],
+      pageSize: 1000000, // effectively disable pagination
+      tableClass: 'custom-table',
+      wrapperClass: 'custom-table-container',
+      theadClass: '',
+      externalInfoEl: dummyInfo // prevent internal footer rendering
     });
   }
-}
 
-function addItemToTable(item) {
-  const tableBody = document.querySelector('#newFwItemsTable tbody');
-  if (!tableBody) return;
+  // Dummy data for display
+  const dummyRows = [
+    {
+      controlId: 'Article I-0-1.1',
+      controlCategory: 'Article I, Business Contact Information',
+      controlDescription: "Company and Supplier may Process the other's BCI wherever they do business in connection with Supplier's delivery of Services and Deliverables.",
+      approved: false
+    },
+    {
+      controlId: 'Article I-0-1.2',
+      controlCategory: 'Article I, Business Contact Information',
+      controlDescription: "A party: (a) will not use or disclose the other party's BCI for any other purpose (for clarity, neither party will Sell the other's BCI or use or disclose the other's BCI for any marketing purpose without the other party's prior written consent, and where required, the prior written consent of affected Data Subjects), and (b) will delete, modify, correct, return, provide information about the Processing of, restrict the Processing of, or take any other reasonably requested action in respect of the other's BCI, promptly on written request from the other party.",
+      approved: false
+    },
+    {
+      controlId: 'Article I-0-1.2',
+      controlCategory: 'Article I, Business Contact Information',
+      controlDescription: 'The parties are not entering a joint Controller relationship regarding each other\'s BCI and no provision of the Transaction Document will be interpreted or construed as indicating any intent to establish a joint Controller relationship.',
+      approved: true
+    },
+    {
+      controlId: 'Article I-0-1.3',
+      controlCategory: 'Article I, Business Contact Information',
+      controlDescription: "This Article applies if Supplier Processes Company Data, other than Company's BCI. Supplier will comply with the requirements of this Article in providing all Services and Deliverables, and by doing so protect Company Data against loss, destruction, alteration, accidental or unauthorized disclosure, accidental or unauthorized access, and unlawful forms of Processing. The requirements of this Article extend to all IT applications, platforms, and infrastructure that Supplier operates or manages in providing Deliverables and Services, including all development, testing, hosting, support, operations, and data center environments.",
+      approved: false
+    },
+    {
+      controlId: 'Article II-0-1.1',
+      controlCategory: 'Article II, Technical and Organizational Measures',
+      controlDescription: 'The parties are not entering a joint Controller relationship regarding each other\'s BCI and no provision of the Transaction Document will be interpreted or construed as indicating any intent to establish a joint Controller relationship.',
+      approved: false
+    }
+  ];
 
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td>${UtilityService.sanitizeHtml(item.controlId || '')}</td>
-    <td>${UtilityService.sanitizeHtml(item.controlCategory || '')}</td>
-    <td>${UtilityService.sanitizeHtml(item.controlDescription || '')}</td>
-    <td class="cell-actions">
-      <button class="icon-btn" title="Edit">✏️</button>
-      <button class="icon-btn"  title="Delete">🗑️</button>
-    </td>
-  `;
-  tableBody.appendChild(tr);
-}
-
-function updateReviewStep() {
-  const form = document.getElementById('frameworkForm');
-  if (!form) return;
-
-  const formData = new FormData(form);
-  const tableRows = Array.from(document.querySelectorAll('#newFwItemsTable tbody tr'));
-
-  currentFrameworkData = {
-    name: formData.get('name'),
-    shortName: formData.get('shortName'),
-    description: formData.get('description'),
-    template: uploadedTemplate,
-    controls: tableRows.map(row => {
-      const cells = row.querySelectorAll('td');
-      return {
-        controlId: cells[0].textContent.trim(),
-        controlCategory: cells[1].textContent.trim(),
-        controlDescription: cells[2].textContent.trim()
-      };
-    })
-  };
-
-  // Display review information
-  const reviewContainer = document.getElementById('reviewContent');
-  if (reviewContainer) {
-    reviewContainer.innerHTML = `
-      <div class="row">
-        <div class="col-md-6">
-          <h6>Framework Details</h6>
-          <table class="table table-sm">
-            <tr><td><strong>Name:</strong></td><td>${UtilityService.sanitizeHtml(currentFrameworkData.name || '')}</td></tr>
-            <tr><td><strong>Short Name:</strong></td><td>${UtilityService.sanitizeHtml(currentFrameworkData.shortName || '')}</td></tr>
-            <tr><td><strong>Description:</strong></td><td>${UtilityService.sanitizeHtml(currentFrameworkData.description || '')}</td></tr>
-            <tr><td><strong>Template:</strong></td><td>${currentFrameworkData.template ? currentFrameworkData.template.name : 'None'}</td></tr>
-          </table>
-        </div>
-        <div class="col-md-6">
-          <h6>Control Items</h6>
-          <p><strong>${currentFrameworkData.controls.length}</strong> control items will be created</p>
-          ${currentFrameworkData.controls.length > 0 ? `
-            <div style="max-height: 200px; overflow-y: auto;">
-              <ul class="plain-list">
-                ${currentFrameworkData.controls.map(control =>
-      `<li class="plain-list-item">
-                    <small><strong>${UtilityService.sanitizeHtml(control.controlId)}</strong><br>
-                    ${UtilityService.truncate(control.controlDescription, 60)}</small>
-                  </li>`
-    ).join('')}
-              </ul>
-            </div>
-          ` : '<p class="muted">No control items added</p>'}
-        </div>
-      </div>
-    `;
+  // Load/update data (works across repeated visits to step 2)
+  if (modalControlsTable) {
+    modalControlsTable.load(dummyRows);
   }
 }
 
@@ -684,6 +683,25 @@ function resetFrameworkForm() {
 
   currentFrameworkData = {};
   uploadedTemplate = null;
+  // Reset step-2 dummy table instance and clear its host container
+  modalControlsTable = null;
+  const step2HostTable = document.getElementById('newFwItemsTable');
+  const step2Host = step2HostTable ? step2HostTable.parentElement : null;
+  if (step2Host) {
+    // Restore original skeleton table structure to keep DOM predictable
+    step2Host.innerHTML = `
+      <table class="custom-table" id="newFwItemsTable">
+        <thead>
+          <tr>
+            <th style="width: 160px;">Control ID</th>
+            <th style="width: 240px;">Control Category</th>
+            <th>Control Description</th>
+            <th class="text-end" style="width: 100px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>`;
+  }
 
   // Reset stepper to first step will be handled by openModal function
 }

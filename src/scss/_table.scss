@@ -146,131 +146,6 @@
 
             }
 
-            .custom-table-container {
-                width: 100%;
-                overflow-x: auto;
-                border: 1px solid $gray-200;
-                border-radius: 8px;
-                height: 100%;
-
-                .custom-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    font-size: 14px;
-
-                    thead {
-                        background: $color-surface;
-
-                        th {
-                            text-align: left;
-                            padding: 12px 16px;
-                            font-weight: 600;
-                            color: $gray-900;
-                            font-size: 14px;
-                            line-height: 21px;
-                            position: relative;
-
-                            &:first-child {
-                                width: 127px;
-                            }
-
-                            &:nth-child(2) {
-                                width: 210px;
-                            }
-
-                            &.sortable {
-                                cursor: pointer;
-                                user-select: none;
-                                transition: background-color 0.2s ease;
-                                padding-right: 40px; // Extra space for the indicator
-
-                                &:hover {
-                                    background-color: $gray-100;
-                                }
-
-                                .sort-indicator {
-                                    position: absolute;
-                                    right: 16px;
-                                    top: 50%;
-                                    transform: translateY(-50%);
-                                    display: flex;
-                                    flex-direction: column;
-                                    align-items: center;
-
-                                    &::before,
-                                    &::after {
-                                        content: '';
-                                        width: 0;
-                                        height: 0;
-                                        border-left: 4px solid transparent;
-                                        border-right: 4px solid transparent;
-                                        display: block;
-                                    }
-
-                                    &::before {
-                                        border-bottom: 4px solid $gray-400;
-                                        margin-bottom: 1px;
-                                    }
-
-                                    &::after {
-                                        border-top: 4px solid $gray-400;
-                                    }
-                                }
-                            }
-
-                            &.sorted-asc .sort-indicator::before {
-                                border-bottom-color: $gray-700;
-                            }
-
-                            &.sorted-desc .sort-indicator::after {
-                                border-top-color: $gray-700;
-                            }
-                        }
-                    }
-
-                    tbody {
-                        tr {
-                            transition: background 0.2s ease;
-
-                            &:nth-child(even) {
-                                background: $color-surface;
-                            }
-
-                            &:nth-child(odd) {
-                                background: $gray-100;
-                            }
-
-                            &:hover {
-                                background: #e0f2fe;
-                            }
-
-                            td {
-                                padding: 16px;
-                                vertical-align: middle;
-                                font-size: 14px;
-                                color: $gray-700;
-                                line-height: 21px;
-
-                                &:first-child {
-                                    width: 127px;
-                                }
-
-                                &:nth-child(2) {
-                                    width: 210px;
-                                }
-                            }
-
-                            .no-data {
-                                text-align: center;
-                                padding: 20px;
-                                color: $gray-600;
-                                font-style: italic;
-                            }
-                        }
-                    }
-                }
-            }
-
             .table-footer {
                 width: 100%;
 
@@ -412,4 +287,135 @@
             }
         }
     }
+}
+
+
+.custom-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid $gray-200;
+    border-radius: 8px;
+    height: 100%;
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+
+        thead {
+            background: $color-surface;
+
+            th {
+                text-align: left;
+                padding: 12px 16px;
+                font-weight: 600;
+                color: $gray-900;
+                font-size: 14px;
+                line-height: 21px;
+                position: relative;
+
+                &:first-child {
+                    width: 127px;
+                }
+
+                &:nth-child(2) {
+                    width: 210px;
+                }
+
+                &.sortable {
+                    cursor: pointer;
+                    user-select: none;
+                    transition: background-color 0.2s ease;
+                    padding-right: 40px; // Extra space for the indicator
+
+                    &:hover {
+                        background-color: $gray-100;
+                    }
+
+                    .sort-indicator {
+                        position: absolute;
+                        right: 16px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+
+                        &::before,
+                        &::after {
+                            content: '';
+                            width: 0;
+                            height: 0;
+                            border-left: 4px solid transparent;
+                            border-right: 4px solid transparent;
+                            display: block;
+                        }
+
+                        &::before {
+                            border-bottom: 4px solid $gray-400;
+                            margin-bottom: 1px;
+                        }
+
+                        &::after {
+                            border-top: 4px solid $gray-400;
+                        }
+                    }
+                }
+
+                &.sorted-asc .sort-indicator::before {
+                    border-bottom-color: $gray-700;
+                }
+
+                &.sorted-desc .sort-indicator::after {
+                    border-top-color: $gray-700;
+                }
+
+                &:last-child {
+                    text-align: right;
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                transition: background 0.2s ease;
+
+                &:nth-child(even) {
+                    background: $color-surface;
+                }
+
+                &:nth-child(odd) {
+                    background: $gray-100;
+                }
+
+                &:hover {
+                    background: #e0f2fe;
+                }
+
+                td {
+                    padding: 16px;
+                    vertical-align: middle;
+                    font-size: 14px;
+                    color: $gray-700;
+                    line-height: 21px;
+
+                    &:first-child {
+                        width: 127px;
+                    }
+
+                    &:nth-child(2) {
+                        width: 210px;
+                    }
+                }
+
+                .no-data {
+                    text-align: center;
+                    padding: 20px;
+                    color: $gray-600;
+                    font-style: italic;
+                }
+            }
+        }
+    }
+
 }
