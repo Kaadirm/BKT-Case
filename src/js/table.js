@@ -41,12 +41,14 @@ export function createSimpleTable(host, { columns, pageSize = 10, tableClass = '
     for (const col of state.columns) {
       const th = document.createElement('th');
       th.textContent = col.label;
+      if (col.key === '__actions') {
+        th.classList.add('action-head');
+      }
       if (col.sortable) {
         th.classList.add('sortable');
         const span = document.createElement('span');
         span.className = 'sort-indicator';
         th.appendChild(span);
-        th.style.cursor = 'pointer';
         th.addEventListener('click', () => sortBy(col.key));
       }
       tr.appendChild(th);
@@ -204,7 +206,6 @@ export function createSimpleTable(host, { columns, pageSize = 10, tableClass = '
       const makeBtn = (label, disabled, page) => {
         const btn = document.createElement('button');
         btn.className = 'data-table-page-btn';
-        btn.style.minWidth = '32px';
         btn.textContent = label;
         btn.disabled = disabled;
         if (disabled) btn.classList.add('is-disabled');
