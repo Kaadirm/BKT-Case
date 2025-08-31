@@ -1,7 +1,9 @@
 {
+  "buildCommand": "npm run build",
   "rewrites": [
-    { "source": "/framework/(.*)", "destination": "/index.html" }
+    {
+      "source": "/framework/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
-
-
