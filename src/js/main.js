@@ -3,7 +3,6 @@ import { createSimpleTable } from './table.js';
 import { createApi } from './services/api.js';
 import { FrameworkService } from './services/framework-service.js';
 import { ControlItemService } from './services/control-item-service.js';
-import fileUploadService from './services/file-upload-service.js';
 import { UtilityService } from './services/utility-service.js';
 import { renderFrameworkItem, renderSkeletonItem } from './renderers.js';
 
@@ -485,42 +484,18 @@ function updateStepContent(stepIndex) {
 function updateFrameworkDetailsStep() {
   // Setup file upload handler
   const fileInput = document.getElementById('templateFile');
-  const filePreview = document.getElementById('filePreview');
 
   if (fileInput && !fileInput.dataset.initialized) {
     fileInput.dataset.initialized = 'true';
 
-    fileInput.addEventListener('change', async (e) => {
+    fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if (!file) {
-        filePreview.innerHTML = '';
-        return;
-      }
+      const fileNameSpan = document.getElementById('templateFileName');
 
-      // Validate file
-      const errors = fileUploadService.validateFile(file, 'template');
-      if (errors.length > 0) {
-        fileInput.value = '';
-        return;
-      }
-
-      // Show file info
-      const fileInfo = fileUploadService.getFileInfo(file);
-      filePreview.innerHTML = `
-        <div class="file-info">
-          <span class="file-icon" aria-hidden="true">📄</span>
-          <strong>${UtilityService.sanitizeHtml(fileInfo.name)}</strong><br>
-          <small>Size: ${fileInfo.sizeFormatted}</small>
-        </div>
-      `;
-
-
-      // Try to parse template for control items
-      if (file.name.endsWith('.csv') || file.name.endsWith('.json')) {
-        const content = await fileUploadService.readFile(file);
-        if (Array.isArray(content)) {
-          // currentFrameworkData.controlsFromTemplate = content;
-        }
+      if (file) {
+        fileNameSpan.textContent = file.name;
+      } else {
+        fileNameSpan.textContent = '';
       }
     });
   }
@@ -637,8 +612,11 @@ function resetFrameworkForm() {
   const tableBody = document.querySelector('#newFwItemsTable tbody');
   if (tableBody) tableBody.innerHTML = '';
 
-  const filePreview = document.getElementById('filePreview');
-  if (filePreview) filePreview.innerHTML = '';
+  // Clear file input and filename display
+  const fileInput = document.getElementById('templateFile');
+  if (fileInput) fileInput.value = '';
+  const fileNameSpan = document.getElementById('templateFileName');
+  if (fileNameSpan) fileNameSpan.textContent = '';
 
   currentFrameworkData = {};
   // uploadedTemplate = null;

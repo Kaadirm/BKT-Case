@@ -23,13 +23,5 @@ export const UtilityService = {
     const temp = document.createElement('div');
     temp.textContent = str;
     return temp.innerHTML;
-  },
-
-  /**
-   * Truncate text with ellipsis
-   */
-  truncate(text, maxLength, suffix = '...') {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength - suffix.length) + suffix;
   }
 };
