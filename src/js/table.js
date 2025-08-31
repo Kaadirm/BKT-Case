@@ -1,4 +1,3 @@
-// A tiny, dependency-free data table with search, sort, and pagination.
 export function createSimpleTable(host, { columns, pageSize = 10, tableClass = 'custom-table', wrapperClass = 'custom-table-container', theadClass = '', externalInfoEl = null, externalPrevBtn = null, externalNextBtn = null, externalPagEl = null, onReset = null } = {}) {
   const state = {
     host,

@@ -21,8 +21,6 @@ const tableCard = document.querySelector('.table-card');
 const searchInput = document.getElementById('tableSearch');
 const pageSizeSelect = document.getElementById('pageSize');
 const pageInfo = document.getElementById('pageInfo');
-const prevPageBtn = document.getElementById('prevPage');
-const nextPageBtn = document.getElementById('nextPage');
 
 let table;
 let currentFrameworkId = null;
