@@ -61,6 +61,22 @@ export function FrameworkManager({
             currentFrameworkId = id;
             activateItem(id);
 
+            // Update page header with selected framework name
+            const itemEl = listEl.querySelector(`.framework-item[data-id="${id}"]`);
+            let selectedName = null;
+            if (itemEl) {
+                const nameEl = itemEl.querySelector('.item-title');
+                selectedName = nameEl ? nameEl.textContent.trim() : null;
+            }
+            updatePageHeader(selectedName);
+
+            if (pageSizeSelect) {
+                pageSizeSelect.value = '10';
+            }
+            if (table && typeof table.setPageSize === 'function') {
+                table.setPageSize(10);
+            }
+
             // Default hide states while loading
             if (tableHost) {
                 tableHost.classList.add('hidden');
@@ -104,7 +120,7 @@ export function FrameworkManager({
                             { key: 'controlCategory', label: 'Control Category', sortable: true, width: '26%' },
                             { key: 'controlDescription', label: 'Control Description', sortable: false, width: 'auto' }
                         ],
-                        pageSize: parseInt(pageSizeSelect.value, 10),
+                        pageSize: 10,
                         tableClass: 'custom-table',
                         wrapperClass: 'custom-table-container',
                         theadClass: '',
@@ -220,8 +236,13 @@ export function FrameworkManager({
 
         const breadcrumbOl = document.querySelector('.info-header nav.breadcrumb ol');
         if (breadcrumbOl) {
-            const existing = breadcrumbOl.querySelector('li[aria-current="page"]');
-            if (existing) existing.remove();
+            const lis = breadcrumbOl.querySelectorAll('li');
+            // Remove any extra li beyond the first two
+            for (let i = lis.length - 1; i >= 2; i--) {
+                lis[i].remove();
+            }
+            // Remove aria-current from all
+            lis.forEach(li => li.removeAttribute('aria-current'));
             if (selectedName) {
                 const li = document.createElement('li');
                 li.className = 'breadcrumb-item';
@@ -231,6 +252,11 @@ export function FrameworkManager({
                 anchor.textContent = selectedName;
                 li.appendChild(anchor);
                 breadcrumbOl.appendChild(li);
+            } else {
+                // Set aria-current on the second li (Compliance Frameworks)
+                if (lis.length >= 2) {
+                    lis[1].setAttribute('aria-current', 'page');
+                }
             }
         }
     }
