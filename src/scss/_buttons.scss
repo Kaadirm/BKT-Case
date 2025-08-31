@@ -134,6 +134,10 @@
     line-height: 21px;
     color: $gray-900;
     border: none;
+
+    &:hover:not(:disabled) {
+        background: color.adjust($gray-100, $lightness: -7%);
+    }
 }
 
 .btn-success {
