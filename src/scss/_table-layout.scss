@@ -297,7 +297,7 @@
 
             .framework-list {
                 height: auto;
-                max-height: 260px;
+                max-height: 400px;
                 overflow-x: auto;
                 overflow-y: auto;
             }
@@ -314,7 +314,6 @@
         padding: 10px;
 
         .table-sidebar .framework-list {
-            max-height: 220px;
             gap: 6px;
         }
 

@@ -469,6 +469,10 @@
 }
 
 @media (max-width: 992px) {
+    .custom-table-container {
+        max-height: 450px;
+    }
+
     .table-content {
         min-height: 260px;
         max-height: none;
