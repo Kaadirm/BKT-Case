@@ -127,35 +127,6 @@ function _parseCSVLine(line) {
 }
 
 /**
- * Create a file preview for supported file types
- */
-async function createFilePreview(file) {
-  const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-
-  if (supportedFileTypes.image.includes(fileExtension)) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.readAsDataURL(file);
-    });
-  }
-
-  if (['.json', '.csv', '.txt'].includes(fileExtension)) {
-    try {
-      const content = await readFile(file);
-      return {
-        type: 'text',
-        content: typeof content === 'string' ? content : JSON.stringify(content, null, 2)
-      };
-    } catch (error) {
-      return { type: 'error', content: `Failed to preview file: ${error.message}` };
-    }
-  }
-
-  return { type: 'info', content: `Preview not available for ${fileExtension} files` };
-}
-
-/**
  * Get file information
  */
 function getFileInfo(file) {
@@ -185,6 +156,5 @@ function _formatFileSize(bytes) {
 export default {
   validateFile,
   readFile,
-  createFilePreview,
   getFileInfo
 };

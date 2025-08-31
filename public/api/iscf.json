@@ -1,6 +1,0 @@
-{
-  "rows": [
-    {"controlId":"ISCF-1","controlCategory":"Internet Security","controlDescription":"Harden public-facing servers."},
-    {"controlId":"ISCF-2","controlCategory":"Internet Security","controlDescription":"TLS everywhere with modern ciphers."}
-  ]
-}

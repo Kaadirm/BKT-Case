@@ -372,7 +372,6 @@ window.addEventListener('popstate', () => {
 
 // Modal stepper wiring - using functional approach
 let currentFrameworkData = {};
-let uploadedTemplate = null;
 let modalControlsTable = null; // step-2 simple table instance
 
 function ensureStepperInstance() {
@@ -495,7 +494,6 @@ function updateFrameworkDetailsStep() {
       const file = e.target.files[0];
       if (!file) {
         filePreview.innerHTML = '';
-        uploadedTemplate = null;
         return;
       }
 
@@ -516,13 +514,12 @@ function updateFrameworkDetailsStep() {
         </div>
       `;
 
-      uploadedTemplate = file;
 
       // Try to parse template for control items
       if (file.name.endsWith('.csv') || file.name.endsWith('.json')) {
         const content = await fileUploadService.readFile(file);
         if (Array.isArray(content)) {
-          currentFrameworkData.controlsFromTemplate = content;
+          // currentFrameworkData.controlsFromTemplate = content;
         }
       }
     });
@@ -669,7 +666,7 @@ function resetFrameworkForm() {
   if (filePreview) filePreview.innerHTML = '';
 
   currentFrameworkData = {};
-  uploadedTemplate = null;
+  // uploadedTemplate = null;
   // Reset step-2 dummy table instance and clear its host container
   modalControlsTable = null;
   const step2HostTable = document.getElementById('newFwItemsTable');
@@ -697,12 +694,6 @@ function resetFrameworkForm() {
 // Framework search/status removed: filtering belongs to controls only.
 
 // Add refresh button functionality
-const refreshBtn = document.getElementById('refreshBtn');
-if (refreshBtn) {
-  refreshBtn.addEventListener('click', async () => {
-    await loadFrameworks();
-  });
-}
 
 // Initialize keyboard shortcuts
 document.addEventListener('keydown', (e) => {
